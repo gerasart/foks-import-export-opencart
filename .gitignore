@@ -1,0 +1,37 @@
+# Theme______________________________________
+
+# Node.js Tools
+node_modules/
+package-lock.json
+
+# NBeans Project. local IDE files
+nbproject/
+
+# JetBrains Rider
+.idea/
+.vscode/
+.sublime-workspace/
+
+# Composer phar
+/wp-app/wp-content/themes/*/composer.phar
+
+*.cache
+*.ide-wal
+*.ide-shm
+
+
+#Build
+#/wordpress/
+#webpack.config.js
+#postcss.config.js
+#/webpack/
+#/logs/
+#/assets/styles/
+#/assets/vue/
+#*.env
+#*.env.sample
+#*.editorconfig
+#*.eslintrc.js
+#*.stylelintrc.js
+#babel.config.js
+#postcss.config.js
