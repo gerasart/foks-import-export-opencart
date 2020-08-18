@@ -11,8 +11,9 @@
             $this->document->addStyle( '/admin/view/app/dist/styles/vue.css' );
             $this->document->setTitle( 'Foks import/Export' );
     
-    
-            $this->confi->set('foks_import_url', '');
+            $version = version_compare(VERSION, '3.0.0', '>=');
+            
+            $this->config->set('foks_import_url', '');
             
             $data['heading_title'] = 'Foks import/Export';
             
@@ -33,29 +34,34 @@
             } else {
                 $data['success'] = '';
             }
-            
-            $token = $this->session->data['token'];
-            
-            
+            if (!$version) {
+                $token = $this->session->data['token'];
+                $token_str = 'token';
+            } else {
+                $token = $this->session->data['user_token'];
+                $token_str = 'user_token';
+            }
+    
             $data['breadcrumbs'] = array();
+            
             
             $data['breadcrumbs'][] = array(
                 'text' => 'Home',
-                'href' => $this->url->link( 'common/dashboard', 'token=' . $token, 'SSL' )
+                'href' => $this->url->link( 'common/dashboard', "{$token_str}=" . $token, 'SSL' )
             );
             
             $data['breadcrumbs'][] = array(
                 'text' => 'Foks',
-                'href' => $this->url->link( 'tool/backup', 'token=' . $token, 'SSL' )
+                'href' => $this->url->link( 'tool/backup', "{$token_str}=" . $token, 'SSL' )
             );
-            
-            
+//            var_dump(version_compare(VERSION, '2.2.0', '<='));
             $foks_settings['foks'] = [
-                'import'   => $this->confi->get('foks_import_url'), //url
+                'import'   => $this->config->get('foks_import_url'), //url
                 'img'      => false, //import with img
                 'logs_url' => '', //folder url
                 'update'   => '', //cron settings
-                'token' => $token
+                'token' => $token,
+                'version3' => $version
             ];
             
             $data['local_vars'] = self::LocalVars( $foks_settings );
