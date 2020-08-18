@@ -11,9 +11,11 @@ export default new Vuex.Store({
   state: {
     foks: window.foks || {
       import: '', //url
-      img: false, //import with img
+      img: 'false', //import with img
       logs_url: '', //folder url
       update: '', //cron settings
+      token: '',
+      version3: ''
     },
   },
   mutations: {

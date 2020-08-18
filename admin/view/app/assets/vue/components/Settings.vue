@@ -21,11 +21,11 @@
       <div class="field-group">
         <div class="sub_title">{{text.update}}</div>
         You can use your server cron jobs
-<!--        <a-radio-group name="radioGroup" v-model="Foks.update">-->
-<!--          <a-radio value="1">1h</a-radio>-->
-<!--          <a-radio value="4">4h</a-radio>-->
-<!--          <a-radio value="24">24h</a-radio>-->
-<!--        </a-radio-group>-->
+        <!--        <a-radio-group name="radioGroup" v-model="Foks.update">-->
+        <!--          <a-radio value="1">1h</a-radio>-->
+        <!--          <a-radio value="4">4h</a-radio>-->
+        <!--          <a-radio value="24">24h</a-radio>-->
+        <!--        </a-radio-group>-->
       </div>
 
       <div class="field-group">
@@ -44,7 +44,8 @@
     <a-col class="block_col export_block" :span="12">
       <div class="title">{{text.title_export}}</div>
       <div class="field-group">
-        <div v-if="!export_spin" class="export_block-link stable">Stable xml: <a target="_blank" :href="Foks.logs_url+text.export">{{Foks.logs_url}}{{text.export}}</a>
+        <div v-if="!export_spin" class="export_block-link stable">Stable xml: <a target="_blank"
+                                                                                 :href="Foks.logs_url+text.export">{{Foks.logs_url}}{{text.export}}</a>
         </div>
         <a-spin v-else />
         <hr>
@@ -67,6 +68,7 @@
         data() {
             return {
                 progress: false,
+                url: 'index.php?route=tool/foks/ajaxSaveSettings',
                 text: {
                     title_import: 'Import',
                     title_export: 'Export',
@@ -97,6 +99,9 @@
                     this.$store.commit('setter', {foks: value})
                 }
             }
+        },
+        mounted() {
+            this.Foks = window.foks;
         },
         methods: {
             ExportFoks() {
@@ -169,15 +174,24 @@
                 });
             },
             saveSettings() {
+                let token = '';
+                let this_token = this.Foks.token;
+                console.log('this.Foks', this.Foks);
+                if (!this.Foks.version3) {
+                    token = `&token=${this_token}`;
+                } else {
+                    token = `&user_token=${this_token}`;
+                }
+
                 const request = {
-                    action: 'saveSettings',
+                    url: this.url + token,
                     data: this.Foks
                 };
                 this.$message.config({
                     top: '50px',
                     duration: 2
                 });
-                this.$store.dispatch('sendRequest', request).then(res => {
+                this.$store.dispatch('send', request).then(res => {
                     console.log(res);
                     this.$message.success({content: this.text.saved});
                 });

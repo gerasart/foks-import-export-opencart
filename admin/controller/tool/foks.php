@@ -12,8 +12,8 @@
             $this->document->setTitle( 'Foks import/Export' );
     
             $version = version_compare(VERSION, '3.0.0', '>=');
-            
-            $this->config->set('foks_import_url', '');
+    
+            $this->load->model('tool/foks');
             
             $data['heading_title'] = 'Foks import/Export';
             
@@ -55,9 +55,10 @@
                 'href' => $this->url->link( 'tool/backup', "{$token_str}=" . $token, 'SSL' )
             );
 //            var_dump(version_compare(VERSION, '2.2.0', '<='));
+    
             $foks_settings['foks'] = [
-                'import'   => $this->config->get('foks_import_url'), //url
-                'img'      => false, //import with img
+                'import'   => $this->model_tool_foks->getSetting('foks_import_url'), //url
+                'img'      => (boolean)$this->model_tool_foks->getSetting('foks_img'), //import with img
                 'logs_url' => '', //folder url
                 'update'   => '', //cron settings
                 'token' => $token,
@@ -243,10 +244,14 @@
         
         
         public function ajaxSaveSettings() {
-            $post = $_POST;
+            $post = $this->request->post;
             
-            $this->config->set('foks_img', $post['img']);
-            $this->config->set('foks_import_url', $post['import']);
+            $this->load->model('tool/foks');
+    
+            $img_val = $post['img'] === 'false' ? '0' : '1';
+    
+            $this->model_tool_foks->editSetting('foks_img', $img_val);
+            $this->model_tool_foks->editSetting('foks_import_url',$post['import']);
             
             $json = $post;
             $this->response->addHeader( 'Content-Type: application/json' );

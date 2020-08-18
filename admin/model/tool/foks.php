@@ -274,6 +274,27 @@
             }
             return $language_data;
         }
+    
+    
+    
+        public function getSetting($key) {
+            $query = $this->db->query("SELECT value FROM " . DB_PREFIX . "setting WHERE  `code` = 'foks' AND `key` = '{$key}' LIMIT 1");
+            $setting_data = $query->row;
+            return $setting_data['value'];
+        }
+    
+        public function editSetting($key, $value, $store_id = 0) {
+            $check  = $this->db->query("SELECT * FROM " . DB_PREFIX . "setting WHERE  `code` = 'foks' AND `key` = '{$key}' LIMIT 1");
+            if (!$check->row) {
+                if ( $value ) {
+                    $this->db->query( "INSERT INTO " . DB_PREFIX . "setting SET store_id = '" . (int)$store_id . "', `code` = '" . $this->db->escape( 'foks' ) . "', `key` = '" . $this->db->escape( $key ) . "', `value` = '" . $this->db->escape( $value ) . "'" );
+                } else {
+                    $this->db->query( "INSERT INTO " . DB_PREFIX . "setting SET store_id = '" . (int)$store_id . "', `code` = '" . $this->db->escape( 'foks' ) . "', `key` = '" . $this->db->escape( $key ) . "', `value` = '" . $this->db->escape( serialize( $value ) ) . "'" );
+                }
+            } else {
+                $this->db->query("UPDATE " . DB_PREFIX . "setting SET `value` = '" . $this->db->escape(($value)) . "', serialized = '1' WHERE `code` = 'foks' AND `key` = '" . $this->db->escape($key) . "' AND store_id = '" . (int)$store_id . "'");
+            }
+        }
         
         
     }
