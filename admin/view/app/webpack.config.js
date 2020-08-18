@@ -23,7 +23,7 @@ const gitRoot = require('git-root');
 
 // PATHS______________________________________________________________________________________________________________
 const relPath = path.relative(gitRoot(), __dirname);
-const assets =  path.join(__dirname, './inc');
+const assets =  path.join(__dirname, './assets');
 
 const PATHS = {
   // resources: path.join(__dirname, './resources'),

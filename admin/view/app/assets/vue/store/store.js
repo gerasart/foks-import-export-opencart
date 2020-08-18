@@ -9,7 +9,12 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    foks: window.foks || [],
+    foks: window.foks || {
+      import: '', //url
+      img: false, //import with img
+      logs_url: '', //folder url
+      update: '', //cron settings
+    },
   },
   mutations: {
     users(state, v) {

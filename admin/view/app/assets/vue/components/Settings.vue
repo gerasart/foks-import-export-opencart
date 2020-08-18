@@ -14,17 +14,18 @@
           <div v-if="current_count">Loaded products: <strong>{{current_count}}</strong></div>
         </div>
         <a-progress class="progress" v-if="progress_count" :percent="+progress_count.toFixed(2)" status="active" />
-        <a-button v-if="!progress" type="primary" class="import_now" @click="importFoks">{{text.import}}
+        <a-button v-if="!progress && Foks.import" type="primary" class="import_now" @click="importFoks">{{text.import}}
         </a-button>
       </div>
 
       <div class="field-group">
         <div class="sub_title">{{text.update}}</div>
-        <a-radio-group name="radioGroup" v-model="Foks.update">
-          <a-radio value="1">1h</a-radio>
-          <a-radio value="4">4h</a-radio>
-          <a-radio value="24">24h</a-radio>
-        </a-radio-group>
+        You can use your server cron jobs
+<!--        <a-radio-group name="radioGroup" v-model="Foks.update">-->
+<!--          <a-radio value="1">1h</a-radio>-->
+<!--          <a-radio value="4">4h</a-radio>-->
+<!--          <a-radio value="24">24h</a-radio>-->
+<!--        </a-radio-group>-->
       </div>
 
       <div class="field-group">
