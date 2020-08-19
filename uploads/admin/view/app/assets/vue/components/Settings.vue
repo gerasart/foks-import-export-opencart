@@ -44,14 +44,18 @@
     <a-col class="block_col export_block" :span="12">
       <div class="title">{{text.title_export}}</div>
       <div class="field-group">
-        <div v-if="!export_spin" class="export_block-link stable">Stable xml: <a target="_blank"
-                                                                                 :href="Foks.logs_url+text.export">{{Foks.logs_url}}{{text.export}}</a>
-        </div>
-        <a-spin v-else />
-        <hr>
-        <a-button v-if="!export_spin" :data-url="Foks.export" type="primary" @click="ExportFoks">{{text.export_now}}
-        </a-button>
-        <a-spin v-else />
+        <a target="_blank" href="/index.php?route=tool/foks">
+          {{text.export}}
+        </a>
+
+<!--        <div v-if="!export_spin" class="export_block-link stable">-->
+<!--         -->
+<!--        </div>-->
+<!--        <a-spin v-else />-->
+<!--        <hr>-->
+<!--        <a-button v-if="!export_spin" :data-url="Foks.export" type="primary" @click="ExportFoks">{{text.export_now}}-->
+<!--        </a-button>-->
+
       </div>
     </a-col>
 

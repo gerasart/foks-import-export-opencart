@@ -7,6 +7,7 @@
         private $error = array();
         
         public function index() {
+            
             $this->document->addScript( '/admin/view/app/dist/scripts/vue.js' );
             $this->document->addStyle( '/admin/view/app/dist/styles/vue.css' );
             $this->document->setTitle( 'Foks import/Export' );

@@ -77,7 +77,7 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "admin/view/app/dist/";
+/******/ 	__webpack_require__.p = "uploads/admin/view/app/dist/";
 /******/
 /******/
 /******/ 	// Load entry module and return exports
@@ -106,7 +106,7 @@
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /Applications/MAMP/htdocs/foksImportExportOpencart/admin/view/app/assets/styles/main.scss */"./assets/styles/main.scss");
+module.exports = __webpack_require__(/*! /Applications/MAMP/htdocs/foksImportExportOpencart/uploads/admin/view/app/assets/styles/main.scss */"./assets/styles/main.scss");
 
 
 /***/ })
