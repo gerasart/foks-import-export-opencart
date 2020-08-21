@@ -141,12 +141,16 @@
             
             return $cat_name;
         }
-        
+    
+        /**
+         * @param $offers
+         * @return array
+         */
         public function parseProducts( $offers ) {
             $n      = count( $offers->offer );
-            $data   = [];
             $result = [];
             for ( $i = 0; $i < $n; $i++ ) {
+                
                 $offer = $offers->offer[ $i ];
                 
                 $product_images = [];
@@ -163,34 +167,31 @@
                         $productName = (string)$offer->model;
                     }
                 }
+                //                $id_category  = (int)$offer->categoryId;
                 
                 $product_description = (string)$offer->description;
-                
-                $id_category  = (int)$offer->categoryId;
-                $manufacturer = isset( $offer->vendor ) ? $offer->vendor : '';
-                $cat_check_name = '';
+                $category_name       = (int)$offer->category;
+                $manufacturer        = isset( $offer->vendor ) ? (string)$offer->vendor : '';
+                $price_old           = isset( $offer->price_old ) ? (float)$offer->price_old : '';
                 
                 $data = array(
                     'name'            => $productName,
                     'price'           => (float)$offer->price,
+                    'price_old'       => $price_old,
                     'quantity'        => (isset( $offer->outlets->outlet['instock'] )) ? (int)$offer->outlets->outlet['instock'] : '999',
                     'model'           => (string)$offer['id'],
                     'sku'             => (!empty( $offer->vendorCode )) ? (string)$offer->vendorCode : (string)$offer['id'],
-                    'category'        => $id_category,
-                    'category_id'     => $this->getCategoryId( $cat_check_name ),
-                    'manufacturer'    => $manufacturer,
+                    'category'        => $category_name,
+                    'category_id'     => $this->getCategoryId( $category_name ),
                     'attributes'      => [],
                     'description'     => $product_description,
-                    'image'           => $product_images[0],
+                    'image'           => isset( $product_images[0] ) ? $product_images[0] : '',
                     'images'          => $product_images,
                     'date_available'  => date( 'Y-m-d' ),
                     'manufacturer_id' => $this->getManufacturerId( $manufacturer ),
+                    'manufacturer'    => $manufacturer,
                     'status'          => '0',
                 );
-                
-                if ( isset( $offer->vendor ) ) {
-                    $data['manufacturer'] = (string)$offer->vendor;
-                }
                 
                 if ( isset( $offer->param ) ) {
                     $params = $offer->param;
@@ -217,7 +218,6 @@
          * @throws \Exception
          */
         public function importData( $file ) {
-            
             $this->load->model( 'tool/foks' );
             $data          = $this->parseFile( $file );
             $total_product = count( $data['products'] );
@@ -300,6 +300,20 @@
                 $id = $manufacturer['manufacturer_id'];
             } else {
                 $id = $this->model_tool_foks->addManufacturerImport( $data );
+            }
+            
+            return $id;
+        }
+        
+        
+        public function getCategoryId( $name ) {
+            $this->load->model( 'tool/foks' );
+            
+            $id          = false;
+            $category_id = $this->model_tool_foks->isCategory( $name );
+            
+            if ( !empty( $category_id ) ) {
+                $id = $category_id['category_id'];
             }
             
             return $id;
