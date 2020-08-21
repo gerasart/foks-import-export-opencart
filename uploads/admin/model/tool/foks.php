@@ -146,7 +146,8 @@
         
             if ( !empty( $data['images'] ) ) {
                 foreach ( $data['images'] as $product_image ) {
-                    $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $this->db->escape( $product_image ) . "', sort_order = '" . (int)0 . "'" );
+                    $img = $this->imgUrlUpload($product_image, $product_id);
+                    $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $this->db->escape( $img ) . "', sort_order = '" . (int)0 . "'" );
                 }
             }
         
