@@ -1,7 +1,6 @@
 <?php
 //    http://opencart20.loc:8888/admin/index.php?route=tool/foks&token=ecf30a52234187c91537942f764a0a13
-    
-    
+//    https://my.foks.biz/s/pb/f?key=498100e4-d428-42dc-96fa-ce2955dba3ed&type=yml_catalog&ext=xml
     class ControllerToolFoks extends Controller {
         
         private $error = array();
@@ -11,10 +10,10 @@
             $this->document->addScript( '/admin/view/app/dist/scripts/vue.js' );
             $this->document->addStyle( '/admin/view/app/dist/styles/vue.css' );
             $this->document->setTitle( 'Foks import/Export' );
-    
-            $version = version_compare(VERSION, '3.0.0', '>=');
-    
-            $this->load->model('tool/foks');
+            
+            $version = version_compare( VERSION, '3.0.0', '>=' );
+            
+            $this->load->model( 'tool/foks' );
             
             $data['heading_title'] = 'Foks import/Export';
             
@@ -35,14 +34,14 @@
             } else {
                 $data['success'] = '';
             }
-            if (!$version) {
-                $token = $this->session->data['token'];
+            if ( !$version ) {
+                $token     = $this->session->data['token'];
                 $token_str = 'token';
             } else {
-                $token = $this->session->data['user_token'];
+                $token     = $this->session->data['user_token'];
                 $token_str = 'user_token';
             }
-    
+            
             $data['breadcrumbs'] = array();
             
             
@@ -56,13 +55,13 @@
                 'href' => $this->url->link( 'tool/backup', "{$token_str}=" . $token, 'SSL' )
             );
 //            var_dump(version_compare(VERSION, '2.2.0', '<='));
-    
+            
             $foks_settings['foks'] = [
-                'import'   => $this->model_tool_foks->getSetting('foks_import_url'), //url
-                'img'      => (boolean)$this->model_tool_foks->getSetting('foks_img'), //import with img
+                'import'   => $this->model_tool_foks->getSetting( 'foks_import_url' ), //url
+                'img'      => (boolean)$this->model_tool_foks->getSetting( 'foks_img' ), //import with img
                 'logs_url' => '', //folder url
                 'update'   => '', //cron settings
-                'token' => $token,
+                'token'    => $token,
                 'version3' => $version
             ];
             
@@ -80,13 +79,13 @@
          * @param $file
          * @return array|\SimpleXMLElement
          */
-        public static function parseFile( $file ) {
+        public function parseFile( $file ) {
             set_time_limit( 0 );
             $xmlstr = file_get_contents( $file );
             $xml    = new \SimpleXMLElement( $xmlstr );
             
             return [
-                'products'   => self::parseProducts( $xml->shop->offers ),
+                'products'   => $this->parseProducts( $xml->shop->offers ),
                 'categories' => self::parseCategories( $xml->shop->categories )
             ];
         }
@@ -103,7 +102,12 @@
                     'parent_id'   => (int)$category['parentId'],
                     'name'        => trim( (string)$category ),
                     'id'          => (string)$category['id'],
-                    'parent_name' => ''
+                    'parent_name' => '',
+                    'store_id'    => 0,
+                    'column'      => 0,
+                    'status'      => 1,
+                    'noindex'     => 0,
+                    'sort_order'  => 1
                 );
             }
             $categories_result = [];
@@ -138,7 +142,7 @@
             return $cat_name;
         }
         
-        public static function parseProducts( $offers ) {
+        public function parseProducts( $offers ) {
             $n      = count( $offers->offer );
             $data   = [];
             $result = [];
@@ -162,24 +166,26 @@
                 
                 $product_description = (string)$offer->description;
                 
-                $id_category = (int)$offer->categoryId;
+                $id_category  = (int)$offer->categoryId;
+                $manufacturer = isset( $offer->vendor ) ? $offer->vendor : '';
+                $cat_check_name = '';
                 
                 $data = array(
-                    'name'           => $productName,
-                    'description'    => $product_description,
-                    'category'       => $id_category,
-                    'model'          => (!empty( $offer->vendorCode )) ? (string)$offer->vendorCode : (string)$offer['id'],
-                    'thumb'          => $product_images[0],
-                    'sku'            => (!empty( $offer->vendorCode )) ? (string)$offer->vendorCode : (string)$offer['id'],
-                    'quantity'       => (isset( $offer->outlets->outlet['instock'] )) ? (int)$offer->outlets->outlet['instock'] : '999',
-                    //                    'stock_status_id'     => ($offer['available'] == 'true') ? 7 : 8,
-                    'date_available' => date( 'Y-m-d' ),
-                    'price'          => (float)$offer->price,
-                    'price_old'      => (float)$offer->price_old,
-                    'status'         => '0',
-                    'images'         => $product_images,
-                    'attributes'     => [],
-                    'manufacturer'   => ''
+                    'name'            => $productName,
+                    'price'           => (float)$offer->price,
+                    'quantity'        => (isset( $offer->outlets->outlet['instock'] )) ? (int)$offer->outlets->outlet['instock'] : '999',
+                    'model'           => (string)$offer['id'],
+                    'sku'             => (!empty( $offer->vendorCode )) ? (string)$offer->vendorCode : (string)$offer['id'],
+                    'category'        => $id_category,
+                    'category_id'     => $this->getCategoryId( $cat_check_name ),
+                    'manufacturer'    => $manufacturer,
+                    'attributes'      => [],
+                    'description'     => $product_description,
+                    'image'           => $product_images[0],
+                    'images'          => $product_images,
+                    'date_available'  => date( 'Y-m-d' ),
+                    'manufacturer_id' => $this->getManufacturerId( $manufacturer ),
+                    'status'          => '0',
                 );
                 
                 if ( isset( $offer->vendor ) ) {
@@ -213,13 +219,11 @@
         public function importData( $file ) {
             
             $this->load->model( 'tool/foks' );
-            
-            
-            $data          = self::parseFile( $file );
+            $data          = $this->parseFile( $file );
             $total_product = count( $data['products'] );
             file_put_contents( DIR_APPLICATION . '/view/app/logs/total.json', $total_product );
-
-//            $categories = $this->model_tool_foks->addCategories($data['categories']);
+            
+            $this->model_tool_foks->addCategories( $data['categories'] );
             $this->model_tool_foks->addProducts( $data['products'] );
             
             return $data;
@@ -247,16 +251,58 @@
         public function ajaxSaveSettings() {
             $post = $this->request->post;
             
-            $this->load->model('tool/foks');
-    
+            $this->load->model( 'tool/foks' );
+            
             $img_val = $post['img'] === 'false' ? '0' : '1';
-    
-            $this->model_tool_foks->editSetting('foks_img', $img_val);
-            $this->model_tool_foks->editSetting('foks_import_url',$post['import']);
+            
+            $this->model_tool_foks->editSetting( 'foks_img', $img_val );
+            $this->model_tool_foks->editSetting( 'foks_import_url', $post['import'] );
             
             $json = $post;
             $this->response->addHeader( 'Content-Type: application/json' );
             $this->response->setOutput( json_encode( $json ) );
+        }
+        
+        public function ajaxImportFoks() {
+            file_put_contents( DIR_APPLICATION . '/view/app/logs/total.json', 0 );
+            
+            $this->load->model( 'tool/foks' );
+            
+            $file_x = $this->model_tool_foks->getSetting( 'foks_import_url' );
+            $file   = str_replace( "&amp;", '&', $file_x );
+            var_dump( $file );
+            $data = [];
+            if ( $file ) {
+                $xml = file_get_contents( $file );
+                file_put_contents( DIR_APPLICATION . '/view/app/logs/foks_import.xml', $xml );
+                $file_path = DIR_APPLICATION . '/view/app/logs/foks_import.xml';
+                $data      = $this->importData( $file_path );
+            }
+            
+            $this->response->addHeader( 'Content-Type: application/json' );
+            $this->response->setOutput( json_encode( $data ) );
+        }
+        
+        
+        public function getManufacturerId( $name ) {
+            $this->load->model( 'tool/foks' );
+            
+            $data = [
+                'name'                     => $name,
+                'sort_order'               => 0,
+                'noindex'                  => 1,
+                'manufacturer_description' => '',
+            ];
+            
+            $manufacturer = $this->model_tool_foks->isManufacturer( $name );
+            
+            if ( isset( $manufacturer['manufacturer_id'] ) ) {
+                $id = $manufacturer['manufacturer_id'];
+            } else {
+                $id = $this->model_tool_foks->addManufacturerImport( $data );
+            }
+            
+            return $id;
         }
         
         

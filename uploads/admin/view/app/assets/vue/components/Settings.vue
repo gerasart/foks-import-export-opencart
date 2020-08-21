@@ -72,7 +72,7 @@
         data() {
             return {
                 progress: false,
-                url: 'index.php?route=tool/foks/ajaxSaveSettings',
+                url: 'index.php?route=tool/foks/',
                 text: {
                     title_import: 'Import',
                     title_export: 'Export',
@@ -91,7 +91,9 @@
                 total_count: 0,
                 error: false,
                 export_spin: false,
-                products_error: ''
+                products_error: '',
+                logs_url: '/admin/view/app/logs/',
+                token: ""
             }
         },
         computed: {
@@ -106,8 +108,18 @@
         },
         mounted() {
             this.Foks = window.foks;
+            this.getToken();
         },
         methods: {
+            getToken() {
+                let this_token = this.Foks.token;
+                if (!this.Foks.version3) {
+                    this.token = `&token=${this_token}`;
+                } else {
+                    this.token = `&user_token=${this_token}`;
+                }
+                console.log(this.logs_url);
+            },
             ExportFoks() {
                 this.export_spin = true;
                 this.$store.dispatch('get', {url: this.Foks.export}).then(res => {
@@ -120,7 +132,7 @@
             },
             importFoks() {
                 const request = {
-                    action: 'importFoks',
+                    url: this.url+'ajaxImportFoks'+ this.token,
                 };
                 this.$message.config({
                     top: '50px',
@@ -128,7 +140,7 @@
                 });
 
                 this.progress = true;
-                this.$store.dispatch('sendRequest', request).then(res => {
+                this.$store.dispatch('send', request).then(res => {
                     console.log('importFoks', res.data);
                     this.progress = false;
                     if (res.data.success) {
@@ -146,7 +158,7 @@
             },
             checkTotal() {
                 if (!this.total_count) {
-                    this.$store.dispatch('get', {url: this.Foks.logs_url + 'total.json'}).then(res => {
+                    this.$store.dispatch('get', {url: this.logs_url + 'total.json'}).then(res => {
                         console.log(res.data);
                         this.total_count = res.data;
                         if (!this.total_count && !this.error) {
@@ -164,7 +176,7 @@
                 }
             },
             checkProgress() {
-                this.$store.dispatch('get', {url: this.Foks.logs_url + 'current.json'}).then(res => {
+                this.$store.dispatch('get', {url: this.logs_url + 'current.json'}).then(res => {
                     let current_count = res.data;
                     this.current_count = res.data;
                     this.progress_count = (current_count / this.total_count * 100);
@@ -178,17 +190,8 @@
                 });
             },
             saveSettings() {
-                let token = '';
-                let this_token = this.Foks.token;
-                console.log('this.Foks', this.Foks);
-                if (!this.Foks.version3) {
-                    token = `&token=${this_token}`;
-                } else {
-                    token = `&user_token=${this_token}`;
-                }
-
                 const request = {
-                    url: this.url + token,
+                    url: this.url+'ajaxSaveSettings'+ this.token,
                     data: this.Foks
                 };
                 this.$message.config({
