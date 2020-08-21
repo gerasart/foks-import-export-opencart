@@ -10,8 +10,9 @@
             $this->document->addScript( '/admin/view/app/dist/scripts/vue.js' );
             $this->document->addStyle( '/admin/view/app/dist/styles/vue.css' );
             $this->document->setTitle( 'Foks import/Export' );
-            
             $version = version_compare( VERSION, '3.0.0', '>=' );
+            
+            self::createImgFolder();
             
             $this->load->model( 'tool/foks' );
             
@@ -64,6 +65,9 @@
                 'token'    => $token,
                 'version3' => $version
             ];
+            file_put_contents( DIR_APPLICATION . '/view/app/logs/total.json', 0 );
+            file_put_contents( DIR_APPLICATION . '/view/app/logs/current.json', 0 );
+            
             
             $data['local_vars'] = self::LocalVars( $foks_settings );
             
@@ -141,12 +145,13 @@
             
             return $cat_name;
         }
-    
+        
         /**
          * @param $offers
          * @return array
          */
         public function parseProducts( $offers ) {
+            $this->load->model( 'tool/foks' );
             $n      = count( $offers->offer );
             $result = [];
             for ( $i = 0; $i < $n; $i++ ) {
@@ -154,9 +159,13 @@
                 $offer = $offers->offer[ $i ];
                 
                 $product_images = [];
-                
-                foreach ( $offer->picture as $picture ) {
-                    $product_images[] = (string)$picture;
+                $attributes     = [];
+                $pictures = $offer->picture;
+                if ( count( $pictures ) > 1 ) {
+                    unset( $pictures[0] );
+                    foreach ( $pictures as $picture ) {
+                        $product_images[] = (string)$picture;
+                    }
                 }
                 
                 $productName = (string)$offer->name;
@@ -167,31 +176,6 @@
                         $productName = (string)$offer->model;
                     }
                 }
-                //                $id_category  = (int)$offer->categoryId;
-                
-                $product_description = (string)$offer->description;
-                $category_name       = (int)$offer->category;
-                $manufacturer        = isset( $offer->vendor ) ? (string)$offer->vendor : '';
-                $price_old           = isset( $offer->price_old ) ? (float)$offer->price_old : '';
-                
-                $data = array(
-                    'name'            => $productName,
-                    'price'           => (float)$offer->price,
-                    'price_old'       => $price_old,
-                    'quantity'        => (isset( $offer->outlets->outlet['instock'] )) ? (int)$offer->outlets->outlet['instock'] : '999',
-                    'model'           => (string)$offer['id'],
-                    'sku'             => (!empty( $offer->vendorCode )) ? (string)$offer->vendorCode : (string)$offer['id'],
-                    'category'        => $category_name,
-                    'category_id'     => $this->getCategoryId( $category_name ),
-                    'attributes'      => [],
-                    'description'     => $product_description,
-                    'image'           => isset( $product_images[0] ) ? $product_images[0] : '',
-                    'images'          => $product_images,
-                    'date_available'  => date( 'Y-m-d' ),
-                    'manufacturer_id' => $this->getManufacturerId( $manufacturer ),
-                    'manufacturer'    => $manufacturer,
-                    'status'          => '0',
-                );
                 
                 if ( isset( $offer->param ) ) {
                     $params = $offer->param;
@@ -200,12 +184,38 @@
                         $attr_name  = (string)$param['name'];
                         $attr_value = (string)$param;
                         
-                        $data['attributes'][] = [
+                        $attributes[] = [
                             'name'  => $attr_name,
                             'value' => $attr_value
                         ];
                     }
                 }
+                //                $id_category  = (int)$offer->categoryId;
+                
+                $product_description = (string)$offer->description;
+                $category_name       = (string)$offer->category;
+                $manufacturer        = isset( $offer->vendor ) ? (string)$offer->vendor : '';
+                $price_old           = isset( $offer->price_old ) ? (float)$offer->price_old : '';
+                $data                = array(
+                    'name'            => $productName,
+                    'price'           => (float)$offer->price,
+                    'price_old'       => $price_old,
+                    'quantity'        => (isset( $offer->outlets->outlet['instock'] )) ? (int)$offer->outlets->outlet['instock'] : '999',
+                    'model'           => (string)$offer['id'],
+                    'sku'             => (!empty( $offer->vendorCode )) ? (string)$offer->vendorCode : (string)$offer['id'],
+                    'category'        => $category_name,
+                    'category_id'     => $this->getCategoryId( $category_name ),
+                    'description'     => $product_description,
+                    'image'           => isset( $offer->picture[0] ) ? $offer->picture[0] : '',
+                    'images'          => $product_images,
+                    'date_available'  => date( 'Y-m-d' ),
+                    'manufacturer_id' => $this->getManufacturerId( $manufacturer ),
+                    'manufacturer'    => $manufacturer,
+                    'status'          => '0',
+                    'attributes'      => $this->model_tool_foks->addAttributes( $attributes ),
+                );
+
+//                var_dump($data);
                 $result[ $i ] = $data;
                 
             }
@@ -289,7 +299,7 @@
             
             $data = [
                 'name'                     => $name,
-                'sort_order'               => 0,
+                'sort_order'               => 1,
                 'noindex'                  => 1,
                 'manufacturer_description' => '',
             ];
@@ -313,10 +323,18 @@
             $category_id = $this->model_tool_foks->isCategory( $name );
             
             if ( !empty( $category_id ) ) {
-                $id = $category_id['category_id'];
+                $id = (int)$category_id['category_id'];
             }
             
             return $id;
+        }
+        
+        public static function createImgFolder() {
+            $dir = DIR_IMAGE . 'catalog/image_url';
+            
+            if ( !file_exists( $dir ) ) {
+                mkdir( $dir, 0777, true );
+            }
         }
         
         
