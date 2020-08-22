@@ -328,7 +328,7 @@
         public function getSetting( $key ) {
             $query        = $this->db->query( "SELECT value FROM " . DB_PREFIX . "setting WHERE  `code` = 'foks' AND `key` = '{$key}' LIMIT 1" );
             $setting_data = $query->row;
-            return $setting_data['value'];
+            return isset($setting_data['value']) && !empty($setting_data['value']) ? $setting_data['value'] : '';
         }
     
         /**
