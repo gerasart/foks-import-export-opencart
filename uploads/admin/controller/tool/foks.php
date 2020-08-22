@@ -56,9 +56,10 @@
                 'href' => $this->url->link( 'tool/backup', "{$token_str}=" . $token, 'SSL' )
             );
 //            var_dump(version_compare(VERSION, '2.2.0', '<='));
+            $file = str_replace( "&amp;", '&', $this->model_tool_foks->getSetting( 'foks_import_url' ) );
             
             $foks_settings['foks'] = [
-                'import'   => $this->model_tool_foks->getSetting( 'foks_import_url' ), //url
+                'import'   => $file, //url
                 'img'      => (boolean)$this->model_tool_foks->getSetting( 'foks_img' ), //import with img
                 'logs_url' => '', //folder url
                 'update'   => '', //cron settings
@@ -160,7 +161,7 @@
                 
                 $product_images = [];
                 $attributes     = [];
-                $pictures = $offer->picture;
+                $pictures       = $offer->picture;
                 if ( count( $pictures ) > 1 ) {
                     unset( $pictures[0] );
                     foreach ( $pictures as $picture ) {
@@ -274,12 +275,12 @@
         public function ajaxImportFoks() {
             file_put_contents( DIR_APPLICATION . '/view/app/logs/total.json', 0 );
             file_put_contents( DIR_APPLICATION . '/view/app/logs/current.json', 0 );
-
+            
             $this->load->model( 'tool/foks' );
             
             $file_x = $this->model_tool_foks->getSetting( 'foks_import_url' );
             $file   = str_replace( "&amp;", '&', $file_x );
-
+            
             $data = [];
             if ( $file ) {
                 $xml = file_get_contents( $file );

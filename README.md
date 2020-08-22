@@ -14,5 +14,26 @@
 
 ## Установка 
 
+- прямой доступ к модулю /admin/index.php?route=tool/foks&token=[токен вашей сессии]
 - установить модификатор foks.ocmod.zip
 - если не получить распаковать архив и установить отдельно install.ocmod.xml через админку а файлы с папки uploads загрузить через ftp
+
+
+## Модуль не появился в админке по адресу 
+
+- опенкарт 2.0 - Инструменты/Foks
+можно вручную добавить в 
+
+admin/controller/common/menu.php
+
+```$data['foks'] = $this->url->link('tool/foks', 'token=' . $this->session->data['token'], 'SSL');```
+
+и
+
+admin/view/template/common/menu.tpl
+
+перед  - <li><a href="<?php echo $upload; ?>"><?php echo $text_upload; ?></a></li>
+
+```<li><a href="<?php echo $foks; ?>">Foks</a></li>```
+
+

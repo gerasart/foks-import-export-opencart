@@ -170,7 +170,7 @@
 
             },
             checkTotal() {
-                if (!this.total_count) {
+                if (!this.total_count && this.progress) {
                     this.$store.dispatch('get', {url: this.logs_url + 'total.json'}).then(res => {
                         console.log(res.data);
                         this.total_count = res.data;
