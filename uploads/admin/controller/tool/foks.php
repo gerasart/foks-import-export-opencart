@@ -63,7 +63,7 @@
                 'logs_url' => '', //folder url
                 'update'   => '', //cron settings
                 'token'    => $token,
-                'version3' => $version
+                'version3' => $version,
             ];
             file_put_contents( DIR_APPLICATION . '/view/app/logs/total.json', 0 );
             file_put_contents( DIR_APPLICATION . '/view/app/logs/current.json', 0 );
@@ -239,7 +239,6 @@
             return $data;
         }
         
-        
         public static function LocalVars( $data ) {
             $html = '';
             
@@ -256,7 +255,6 @@
             }
             return $html;
         }
-        
         
         public function ajaxSaveSettings() {
             $post = $this->request->post;
@@ -275,12 +273,13 @@
         
         public function ajaxImportFoks() {
             file_put_contents( DIR_APPLICATION . '/view/app/logs/total.json', 0 );
-            
+            file_put_contents( DIR_APPLICATION . '/view/app/logs/current.json', 0 );
+
             $this->load->model( 'tool/foks' );
             
             $file_x = $this->model_tool_foks->getSetting( 'foks_import_url' );
             $file   = str_replace( "&amp;", '&', $file_x );
-            var_dump( $file );
+
             $data = [];
             if ( $file ) {
                 $xml = file_get_contents( $file );
@@ -292,7 +291,6 @@
             $this->response->addHeader( 'Content-Type: application/json' );
             $this->response->setOutput( json_encode( $data ) );
         }
-        
         
         public function getManufacturerId( $name ) {
             $this->load->model( 'tool/foks' );
@@ -314,7 +312,6 @@
             
             return $id;
         }
-        
         
         public function getCategoryId( $name ) {
             $this->load->model( 'tool/foks' );

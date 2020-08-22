@@ -15,9 +15,9 @@
             
             $products = $this->model_catalog_product->getProducts();
             
-            $protocol   = strpos( strtolower( $_SERVER['SERVER_PROTOCOL'] ), 'https' ) === FALSE ? 'http' : 'https';
-            $domainLink = $protocol . '://' . $_SERVER['HTTP_HOST'];
-            $config_name  = $this->config->get( 'config_name' );
+            $protocol    = strpos( strtolower( $_SERVER['SERVER_PROTOCOL'] ), 'https' ) === FALSE ? 'http' : 'https';
+            $domainLink  = $protocol . '://' . $_SERVER['HTTP_HOST'];
+            $config_name = $this->config->get( 'config_name' );
             
             $name    = $config_name;
             $company = $config_name;
@@ -78,19 +78,19 @@
                     if ( $images ) {
                         foreach ( $images as $img ) {
                             $product['images'][] = [
-                                'popup' => $domainLink.'/image/' . $img['image'],
+                                'popup' => $domainLink . '/image/' . $img['image'],
                                 //                                'popup' => $this->model_tool_image->resize( $img['image'], $this->config->get( 'theme_' . $this->config->get( 'config_theme' ) . '_image_popup_width' ), $this->config->get( 'theme_' . $this->config->get( 'config_theme' ) . '_image_popup_height' ) ),
                             ];
                         }
                     }
                     
-                    $price_format = sprintf('%01.2f', $product['price']);
-                    
+                    $price_format = sprintf( '%01.2f', $product['price'] );
                     $price        = $price_format ? $price_format : 1;
-                    
-                    $cat   = $this->clearCat( $this->model_catalog_product->getCategories( $product['product_id'] ) );
+                    $attributes   = $this->model_catalog_product->getProductAttributes( $product['product_id'] );
+//                    var_dump($attributes);
+                    $cat = $this->clearCat( $this->model_catalog_product->getCategories( $product['product_id'] ) );
 //                        $thumb = $this->model_tool_image->resize( $product['image'], $this->config->get( 'theme_' . $this->config->get( 'config_theme' ) . '_image_thumb_width' ), $this->config->get( 'theme_' . $this->config->get( 'config_theme' ) . '_image_thumb_height' ) );
-                    $thumb = $domainLink .'/image/' . $product['image'];
+                    $thumb = $domainLink . '/image/' . $product['image'];
                     if ( !$thumb ) {
                         $thumb = '';
                     }
@@ -110,6 +110,17 @@
 //                        $output .= '<country>Украина</country>' . "\n";
                     $output .= '<description>' . htmlspecialchars( $product['description'] ) . "\n";
                     $output .= '</description>' . "\n";
+                    if ( count( $attributes ) ) {
+                        foreach ( $attributes as $attr ) {
+                            if ( $attr['attribute'] && count( $attr ) ) {
+                                foreach ($attr['attribute'] as  $item) {
+                                    $output  .= "<param name=\"{$item['name']}\">{$item['text']}</param>";
+                                }
+                            }
+                        }
+                    }
+                    
+                    
                     $output .= '</offer>' . "\n";
                 }
             }

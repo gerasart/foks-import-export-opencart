@@ -14,13 +14,18 @@
           <div v-if="current_count">Loaded products: <strong>{{current_count}}</strong></div>
         </div>
         <a-progress class="progress" v-if="progress_count" :percent="+progress_count.toFixed(2)" status="active" />
-        <a-button v-if="!progress && Foks.import" type="primary" class="import_now" @click="importFoks">{{text.import}}
+        <a-button v-if="!progress && Foks.import && !reload" type="primary" class="import_now" @click="importFoks">{{text.import}}
         </a-button>
+        <a-button v-if="reload" @click="reloadPage">Reload page</a-button>
       </div>
 
       <div class="field-group">
         <div class="sub_title">{{text.update}}</div>
         You can use your server cron jobs
+
+        <strong>Use this link</strong>
+        <code>{{locationOrigin()}}/index.php?route=tool/foks_cron</code>
+
         <!--        <a-radio-group name="radioGroup" v-model="Foks.update">-->
         <!--          <a-radio value="1">1h</a-radio>-->
         <!--          <a-radio value="4">4h</a-radio>-->
@@ -93,7 +98,8 @@
                 export_spin: false,
                 products_error: '',
                 logs_url: '/admin/view/app/logs/',
-                token: ""
+                token: "",
+                reload: false
             }
         },
         computed: {
@@ -111,6 +117,12 @@
             this.getToken();
         },
         methods: {
+            locationOrigin() {
+               return location.origin;
+            },
+            reloadPage() {
+                location.reload()
+            },
             getToken() {
                 let this_token = this.Foks.token;
                 if (!this.Foks.version3) {
@@ -143,6 +155,7 @@
                 this.$store.dispatch('send', request).then(res => {
                     console.log('importFoks', res.data);
                     this.progress = false;
+                    this.reload = true;
                     if (res.data.success) {
                         this.$message.success({content: this.text.success});
                     }

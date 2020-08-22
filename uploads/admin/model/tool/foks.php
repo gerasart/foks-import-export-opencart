@@ -376,8 +376,7 @@
         
             return $query->row;
         }
-    
-    
+        
         public function isAttrGroup( $attr_name ) {
             $query = $this->db->query( "SELECT DISTINCT attribute_group_id FROM " . DB_PREFIX . "attribute_group_description WHERE name = '" . $attr_name . "'" );
         
@@ -385,12 +384,11 @@
         }
         
         public function isAttribute($data) {
-            $query = $this->db->query( "SELECT DISTINCT * FROM " . DB_PREFIX . "attribute_description WHERE name = '" . $data['name'] . "'" );
+            $query = $this->db->query( "SELECT DISTINCT attribute_id FROM " . DB_PREFIX . "attribute_description WHERE name = '" . $data['name'] . "'" );
     
             return $query->row;
         }
-    
-    
+        
         protected function imgUrlUpload($image_url, $product_id, $result = true)
         {
             $folder = DIR_IMAGE . 'catalog/image_url/product' . $product_id;
@@ -434,7 +432,6 @@
             }
         }
         
-        
         public function addAttribute($attribute, $attr_group_id)  {
             $this->db->query( "INSERT INTO " . DB_PREFIX . "attribute SET attribute_group_id = '" . (int)$attr_group_id . "'" );
             $attribute_id = $this->db->getLastId();
@@ -452,7 +449,6 @@
             return $query->row;
         }
         
-        
         public function addAttributes($attributes) {
             $attr_group_id = $this->createGroupAttribute();
             $attrs  = [];
@@ -460,9 +456,8 @@
             if ($attributes) {
                 foreach ( $attributes as $attribute ) {
                     $attr_id = $this->isAttribute( $attribute );
-        
-                    if ( $attr_id ) {
-                        $attr                           = $this->getAttribute( $attr_id );
+                    if ( isset($attr_id['attribute_id']) && !empty($attr_id['attribute_id']) ) {
+                        $attr                           = $this->getAttribute( $attr_id['attribute_id'] );
                         $attrs[ $attr['attribute_id'] ] = $attribute['value'];
                     } else {
                         $attr                           = $this->addAttribute( $attribute, $attr_group_id );
@@ -497,8 +492,4 @@
     
         }
         
-        
-    
-    
-    
     }
