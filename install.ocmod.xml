@@ -1,6 +1,6 @@
 <modification>
 	<name>Foks</name>
-	<version>1</version>
+	<version>1.1</version>
 	<link>https://foks.biz/</link>
 	<author>cs50.com.ua</author>
 	<code>foks</code>
@@ -20,26 +20,27 @@
 	<file path="admin/controller/common/column_left.php">
 		<operation>
 			<search><![CDATA[if ($this->user->hasPermission('access', 'tool/backup')) {]]></search>
-			<add position="before"><![CDATA[
+			<add position="after"><![CDATA[
 			// opencart 3
+			$version = version_compare(VERSION, '3.0.0', '>=');
+				if (!$version) {
+				$tool[] = array(
+					'name'	   => 'Foks',
+					'href'     => $this->url->link('tool/foks', 'token=' . $this->session->data['token'], true),
+					'children' => array()
+				);
+				} else {
 				$maintenance[] = array(
 					'name'	   => 'Foks',
 					'href'     => $this->url->link('tool/foks', 'user_token=' . $this->session->data['user_token'], true),
 					'children' => array()
 				);
+				}
             ]]></add>
 		</operation>
 	</file>
 
-    <file path="admin/view/template/common/menu.tpl">
-    	<operation>
-    		<search><![CDATA[<li><a href="<?php echo $upload; ?>"><?php echo $text_upload; ?></a></li>]]></search>
-    		<add position="after"><![CDATA[
-				<li><a href="<?php echo $foks; ?>">Foks</a></li>
-            ]]></add>
-    	</operation>
-	</file>
-	<file path="admin/view/template/common/column_left.twig">
+	<file path="admin/view/template/common/menu.tpl">
 		<operation>
 			<search><![CDATA[<li><a href="<?php echo $upload; ?>"><?php echo $text_upload; ?></a></li>]]></search>
 			<add position="after"><![CDATA[
