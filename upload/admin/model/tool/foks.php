@@ -1,6 +1,10 @@
 <?php
     
     class ModelToolFoks extends Model {
+    
+        private $log_folder = 'view/javascript/app/logs/';
+    
+        
         /**
          * @param $categories
          */
@@ -78,7 +82,7 @@
                 } else {
                     $this->addProductImport( $product );
                 }
-                file_put_contents( DIR_APPLICATION . '/view/app/logs/current.json', 0 );
+                file_put_contents( DIR_APPLICATION .$this->log_folder. 'current.json', 0 );
                 $i++;
             }
             

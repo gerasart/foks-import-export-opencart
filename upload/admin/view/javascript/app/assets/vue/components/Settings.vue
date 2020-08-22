@@ -97,7 +97,7 @@
                 error: false,
                 export_spin: false,
                 products_error: '',
-                logs_url: '/admin/view/app/logs/',
+                logs_url: '/admin/view/javascript/app/logs/',
                 token: "",
                 reload: false
             }

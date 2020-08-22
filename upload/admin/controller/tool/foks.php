@@ -4,11 +4,13 @@
     class ControllerToolFoks extends Controller {
         
         private $error = array();
+        private $log_folder = 'view/javascript/app/logs/';
+        private $dist_folder = '/admin/view/javascript/app/dist/';
         
         public function index() {
             
-            $this->document->addScript( '/admin/view/javascript/app/dist/scripts/vue.js' );
-            $this->document->addStyle( '/admin/view/javascript/app/dist/styles/vue.css' );
+            $this->document->addScript( $this->dist_folder . 'scripts/vue.js' );
+            $this->document->addStyle( $this->dist_folder . 'styles/vue.css' );
             $this->document->setTitle( 'Foks import/Export' );
             $version = version_compare( VERSION, '3.0.0', '>=' );
             
@@ -61,13 +63,14 @@
             $foks_settings['foks'] = [
                 'import'   => $file, //url
                 'img'      => (boolean)$this->model_tool_foks->getSetting( 'foks_img' ), //import with img
-                'logs_url' => '', //folder url
+                'logs_url' => $this->log_folder, //folder url
                 'update'   => '', //cron settings
                 'token'    => $token,
                 'version3' => $version,
             ];
-            file_put_contents( DIR_APPLICATION . 'view/app/logs/total.json', 0 );
-            file_put_contents( DIR_APPLICATION . 'view/app/logs/current.json', 0 );
+            
+            file_put_contents( DIR_APPLICATION . $this->log_folder . 'total.json', 0 );
+            file_put_contents( DIR_APPLICATION . $this->log_folder . 'current.json', 0 );
             
             
             $data['local_vars'] = self::LocalVars( $foks_settings );
@@ -232,7 +235,7 @@
             $this->load->model( 'tool/foks' );
             $data          = $this->parseFile( $file );
             $total_product = count( $data['products'] );
-            file_put_contents( DIR_APPLICATION . 'view/app/logs/total.json', $total_product );
+            file_put_contents( DIR_APPLICATION . $this->log_folder . 'total.json', $total_product );
             
             $this->model_tool_foks->addCategories( $data['categories'] );
             $this->model_tool_foks->addProducts( $data['products'] );
@@ -273,8 +276,8 @@
         }
         
         public function ajaxImportFoks() {
-            file_put_contents( DIR_APPLICATION . 'view/app/logs/total.json', 0 );
-            file_put_contents( DIR_APPLICATION . 'view/app/logs/current.json', 0 );
+            file_put_contents( DIR_APPLICATION . $this->log_folder . 'total.json', 0 );
+            file_put_contents( DIR_APPLICATION . $this->log_folder . 'current.json', 0 );
             
             $this->load->model( 'tool/foks' );
             
@@ -284,8 +287,8 @@
             $data = [];
             if ( $file ) {
                 $xml = file_get_contents( $file );
-                file_put_contents( DIR_APPLICATION . 'view/app/logs/foks_import.xml', $xml );
-                $file_path = DIR_APPLICATION . 'view/app/logs/foks_import.xml';
+                file_put_contents( DIR_APPLICATION . $this->log_folder . 'foks_import.xml', $xml );
+                $file_path = DIR_APPLICATION . $this->log_folder . 'foks_import.xml';
                 $data      = $this->importData( $file_path );
             }
             
