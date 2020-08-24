@@ -2,6 +2,9 @@
     
     class ModelToolFoksCron extends Model {
     
+        private $log_folder = 'view/javascript/app/logs/';
+    
+    
         /**
          * @param $categories
          */
@@ -71,7 +74,9 @@
          * @param $products
          */
         public function addProducts( $products ) {
+            $i = 0;
             foreach ( $products as $product ) {
+                $i++;
                 $is_product = $this->getProductByUniqueId( $product['model'] );
                 if ( $is_product ) {
                     $this->UpdateProductImport( $is_product, $product );
@@ -79,14 +84,16 @@
                     $this->addProductImport( $product );
                 }
             }
-        }
         
+        }
+    
         /**
          * @param $data
          * @return mixed
          */
         public function addManufacturerImport( $data ) {
             $prefix = DB_PREFIX;
+        
             $res_data = [
                 'name'  => $this->db->escape( $data['name'] ),
             ];
@@ -116,6 +123,7 @@
          */
         public function addProductImport( $data ) {
             $languages = $this->getLanguages();
+            $load_without_img = (boolean)$this->getSetting( 'foks_img' );
         
             $sql_q     = "INSERT INTO " . DB_PREFIX . "product SET model = '" . $this->db->escape( $data['model'] ) . "', ";
             $sql_q     .= "sku = '" . $this->db->escape( $data['sku'] ) . "', ";
@@ -130,7 +138,7 @@
         
             $product_id = $this->db->getLastId();
         
-            if ( isset( $data['image'] ) && !empty($data['image']) ) {
+            if ( isset( $data['image'] ) && !empty($data['image']) && !$load_without_img ) {
                 $thumb = $this->imgUrlUpload($data['image'], (int)$product_id);
             
                 $this->db->query( "UPDATE " . DB_PREFIX . "product SET image = '" . $thumb . "' WHERE product_id = '" . (int)$product_id . "'" );
@@ -158,7 +166,7 @@
             
             }
         
-            if ( !empty( $data['images'] ) ) {
+            if ( !empty( $data['images'] ) && !$load_without_img ) {
                 foreach ( $data['images'] as $product_image ) {
                     $img = $this->imgUrlUpload($product_image, (int)$product_id);
                     $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $img . "', sort_order = '" . (int)0 . "'" );
@@ -186,7 +194,7 @@
          */
         public function UpdateProductImport( $product_id, $data ) {
             $product_id = $product_id['row'];
-        
+            $load_without_img = (boolean)$this->getSetting( 'foks_img' );
             $languages = $this->getLanguages();
         
             $sql_q = "UPDATE " . DB_PREFIX . "product SET model = '" . $this->db->escape( $data['model'] ) . "', ";
@@ -200,7 +208,7 @@
         
             $this->db->query( $sql_q );
         
-            if ( isset( $data['image'] ) && !empty($data['image']) ) {
+            if ( isset( $data['image'] ) && !empty($data['image'] && !$load_without_img) ) {
                 $thumb = $this->imgUrlUpload($data['image'], (int)$product_id);
             
                 $this->db->query( "UPDATE " . DB_PREFIX . "product SET image = '" . $thumb . "' WHERE product_id = '" . (int)$product_id . "'" );
@@ -223,7 +231,7 @@
             
             }
         
-            if ( !empty( $data['images'] ) ) {
+            if ( !empty( $data['images'] ) && !$load_without_img ) {
                 foreach ( $data['images'] as $product_image ) {
                     $img = $this->imgUrlUpload($product_image, (int)$product_id);
                     $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $img. "', sort_order = '" . (int)1 . "'" );
@@ -238,7 +246,7 @@
         
             $this->db->query( "DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'" );
         
-            if ( isset( $data['category'] ) ) {
+            if ( isset( $data['category_id'] ) ) {
                 $this->db->query( "INSERT INTO " . DB_PREFIX . "product_to_category SET product_id = '" . (int)$product_id . "', category_id = '" . (int)$data['category_id'] . "'" );
 //                $this->db->query( "INSERT INTO " . DB_PREFIX . "product_to_category SET product_id = '" . (int)$product_id . "', category_id = '" . (int)$data['category_id'] . "', main_category = 1" );
             }
@@ -321,7 +329,7 @@
         public function getSetting( $key ) {
             $query        = $this->db->query( "SELECT value FROM " . DB_PREFIX . "setting WHERE  `code` = 'foks' AND `key` = '{$key}' LIMIT 1" );
             $setting_data = $query->row;
-            return $setting_data['value'];
+            return isset($setting_data['value']) && !empty($setting_data['value']) ? $setting_data['value'] : '';
         }
     
         /**
@@ -335,24 +343,6 @@
             $query = $this->db->query( $sql );
         
             return $query->row;
-        }
-    
-        /**
-         * @param $key
-         * @param $value
-         * @param int $store_id
-         */
-        public function editSetting( $key, $value, $store_id = 0 ) {
-            $check = $this->db->query( "SELECT * FROM " . DB_PREFIX . "setting WHERE  `code` = 'foks' AND `key` = '{$key}' LIMIT 1" );
-            if ( !$check->row ) {
-                if ( $value ) {
-                    $this->db->query( "INSERT INTO " . DB_PREFIX . "setting SET store_id = '" . (int)$store_id . "', `code` = '" . $this->db->escape( 'foks' ) . "', `key` = '" . $this->db->escape( $key ) . "', `value` = '" . $this->db->escape( serialize( $value ) ) . "'" );
-                } else {
-                    $this->db->query( "INSERT INTO " . DB_PREFIX . "setting SET store_id = '" . (int)$store_id . "', `code` = '" . $this->db->escape( 'foks' ) . "', `key` = '" . $this->db->escape( $key ) . "', `value` = '" . $this->db->escape( serialize( $value ) ) . "'" );
-                }
-            } else {
-                $this->db->query( "UPDATE " . DB_PREFIX . "setting SET `value` = '" . $this->db->escape( ($value) ) . "', serialized = '1' WHERE `code` = 'foks' AND `key` = '" . $this->db->escape( $key ) . "' AND store_id = '" . (int)$store_id . "'" );
-            }
         }
     
         /**
@@ -450,7 +440,7 @@
             $attr_group_id = $this->createGroupAttribute();
             $attrs  = [];
         
-            if ($attributes) {
+            if (!empty($attributes)) {
                 foreach ( $attributes as $attribute ) {
                     $attr_id = $this->isAttribute( $attribute );
                     if ( isset($attr_id['attribute_id']) && !empty($attr_id['attribute_id']) ) {

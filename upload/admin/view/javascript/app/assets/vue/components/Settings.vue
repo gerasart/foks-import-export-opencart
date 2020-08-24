@@ -1,6 +1,6 @@
 <template>
   <div class="foks_settings">
-    <a-col class="block_col import_block" :span="8">
+    <a-col class="block_col import_block" :span="12">
       <div class="title">{{text.title_import}}</div>
       <div class="import_block-link"></div>
 
@@ -24,6 +24,7 @@
         You can use your server cron jobs
 
         <strong>Use this link</strong>
+        <br>
         <code>{{locationOrigin()}}/index.php?route=tool/foks_cron</code>
 
         <!--        <a-radio-group name="radioGroup" v-model="Foks.update">-->
@@ -46,7 +47,7 @@
 
     </a-col>
 
-    <a-col class="block_col export_block" :span="12">
+    <a-col class="block_col export_block" :span="8">
       <div class="title">{{text.title_export}}</div>
       <div class="field-group">
         <a target="_blank" href="/index.php?route=tool/foks">
@@ -190,6 +191,8 @@
             },
             checkProgress() {
                 this.$store.dispatch('get', {url: this.logs_url + 'current.json'}).then(res => {
+                    console.log('checkProgress',res);
+
                     let current_count = res.data;
                     this.current_count = res.data;
                     this.progress_count = (current_count / this.total_count * 100);

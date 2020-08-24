@@ -76,6 +76,7 @@
         public function addProducts( $products ) {
             $i = 0;
             foreach ( $products as $product ) {
+                $i++;
                 $is_product = $this->getProductByUniqueId( $product['model'] );
                 if ( $is_product ) {
                     $this->UpdateProductImport( $is_product, $product );
@@ -83,7 +84,6 @@
                     $this->addProductImport( $product );
                 }
                 file_put_contents( DIR_APPLICATION . $this->log_folder . 'current.json', $i );
-                $i++;
             }
             
         }
@@ -94,6 +94,7 @@
          */
         public function addManufacturerImport( $data ) {
             $prefix = DB_PREFIX;
+            
             $res_data = [
               'name'  => $this->db->escape( $data['name'] ),
             ];
@@ -458,7 +459,7 @@
             $attr_group_id = $this->createGroupAttribute();
             $attrs  = [];
             
-            if ($attributes) {
+            if (!empty($attributes)) {
                 foreach ( $attributes as $attribute ) {
                     $attr_id = $this->isAttribute( $attribute );
                     if ( isset($attr_id['attribute_id']) && !empty($attr_id['attribute_id']) ) {

@@ -8,6 +8,7 @@
         private $error = array();
         private $log_folder = 'view/javascript/app/logs/';
         private $dist_folder = '/admin/view/javascript/app/dist/';
+        private static $categoreis = [];
         
         public function index() {
             
@@ -81,7 +82,7 @@
             $data['column_left'] = $this->load->controller( 'common/column_left' );
             $data['footer']      = $this->load->controller( 'common/footer' );
             
-            if (!$version) {
+            if ( !$version ) {
                 $this->response->setOutput( $this->load->view( 'tool/foks.tpl', $data ) );
             } else {
                 $this->response->setOutput( $this->load->view( 'tool/foks', $data ) );
@@ -99,8 +100,8 @@
             $xml    = new \SimpleXMLElement( $xmlstr );
             
             return [
-                'products'   => $this->parseProducts( $xml->shop->offers ),
-                'categories' => self::parseCategories( $xml->shop->categories )
+                'categories' => self::parseCategories( $xml->shop->categories ),
+                'products'   => $this->parseProducts( $xml->shop->offers )
             ];
         }
         
@@ -109,8 +110,9 @@
          * @return array
          */
         public static function parseCategories( $categories ) {
-            $categoriesList = array();
-            $data           = $categories->category;
+            $categoriesList   = array();
+            $data             = $categories->category;
+            self::$categoreis = [];
             foreach ( $data as $category ) {
                 $categoriesList[] = array(
                     'parent_id'   => (int)$category['parentId'],
@@ -128,6 +130,7 @@
             foreach ( $categoriesList as $item ) {
                 $item['parent_name'] = self::getParentCatName( $categoriesList, $item['parent_id'] );
                 $categories_result[] = $item;
+                self::$categoreis[]  = $item;
             }
             
             return $categories_result;
@@ -170,7 +173,7 @@
                 
                 $product_images = [];
                 $attributes     = [];
-                $pictures       = $offer->picture;
+                $pictures       = isset( $offer->picture ) ? $offer->picture : 0;
                 if ( count( $pictures ) > 1 ) {
                     unset( $pictures[0] );
                     foreach ( $pictures as $picture ) {
@@ -179,6 +182,7 @@
                 }
                 
                 $productName = (string)$offer->name;
+                
                 if ( !$productName ) {
                     if ( isset( $offer->typePrefix ) ) {
                         $productName = (string)$offer->typePrefix . ' ' . (string)$offer->model;
@@ -200,21 +204,28 @@
                         ];
                     }
                 }
-                //                $id_category  = (int)$offer->categoryId;
                 
-                $product_description = (string)$offer->description;
-                $category_name       = (string)$offer->category;
+                $id_category         = (string)$offer->categoryId;
+                $product_description = isset( $offer->description ) ? (string)$offer->description : '';
+                $category_name       = isset( $offer->category ) ? (string)$offer->category : '';
                 $manufacturer        = isset( $offer->vendor ) ? (string)$offer->vendor : '';
                 $price_old           = isset( $offer->price_old ) ? (float)$offer->price_old : '';
-                $data                = array(
+                
+                
+                if ( empty( $category_name ) ) {
+                    $category_name = self::searchCatName($id_category);
+                }
+                
+                $data = array(
                     'name'            => $productName,
-                    'price'           => (float)$offer->price,
+                    'price'           => isset( $offer->price ) ? (float)$offer->price : '',
                     'price_old'       => $price_old,
                     'quantity'        => (isset( $offer->outlets->outlet['instock'] )) ? (int)$offer->outlets->outlet['instock'] : '999',
                     'model'           => (string)$offer['id'],
-                    'sku'             => (!empty( $offer->vendorCode )) ? (string)$offer->vendorCode : (string)$offer['id'],
+                    'sku'             => isset( $offer->vendorCode ) && !empty( $offer->vendorCode ) ? (string)$offer->vendorCode : (string)$offer['id'],
                     'category'        => $category_name,
                     'category_id'     => $this->getCategoryId( $category_name ),
+                    'parent_category' => '',
                     'description'     => $product_description,
                     'image'           => isset( $offer->picture[0] ) ? $offer->picture[0] : '',
                     'images'          => $product_images,
@@ -282,9 +293,8 @@
         }
         
         public function ajaxImportFoks() {
-            file_put_contents( DIR_APPLICATION . $this->log_folder . 'total.json', 0 );
-            file_put_contents( DIR_APPLICATION . $this->log_folder . 'current.json', 0 );
-            
+//            file_put_contents( DIR_APPLICATION . $this->log_folder . 'total.json', 0 );
+//            file_put_contents( DIR_APPLICATION . $this->log_folder . 'current.json', 0 );
             $this->load->model( 'tool/foks' );
             
             $file_x = $this->model_tool_foks->getSetting( 'foks_import_url' );
@@ -303,37 +313,40 @@
         }
         
         public function getManufacturerId( $name ) {
-            $this->load->model( 'tool/foks' );
-            
-            $data = [
-                'name'                     => $name,
-                'sort_order'               => 1,
-                'noindex'                  => 1,
-                'manufacturer_description' => '',
-            ];
-            
-            $manufacturer = $this->model_tool_foks->isManufacturer( $name );
-            
-            if ( isset( $manufacturer['manufacturer_id'] ) ) {
-                $id = $manufacturer['manufacturer_id'];
-            } else {
-                $id = $this->model_tool_foks->addManufacturerImport( $data );
+            if ( !empty( $name ) ) {
+                $this->load->model( 'tool/foks' );
+                $data         = [
+                    'name'                     => addslashes( $name ),
+                    'sort_order'               => 1,
+                    'noindex'                  => 1,
+                    'manufacturer_description' => '',
+                ];
+                $manufacturer = $this->model_tool_foks->isManufacturer( $data['name'] );
+                if ( isset( $manufacturer['manufacturer_id'] ) ) {
+                    $id = $manufacturer['manufacturer_id'];
+                } else {
+                    $id = $this->model_tool_foks->addManufacturerImport( $data );
+                }
+                return $id;
             }
-            
-            return $id;
+            return false;
         }
         
         public function getCategoryId( $name ) {
-            $this->load->model( 'tool/foks' );
-            
-            $id          = false;
-            $category_id = $this->model_tool_foks->isCategory( $name );
-            
-            if ( !empty( $category_id ) ) {
-                $id = (int)$category_id['category_id'];
+            if ( !empty( $name ) ) {
+                $this->load->model( 'tool/foks' );
+                
+                $id          = false;
+                $category_id = $this->model_tool_foks->isCategory( $name );
+                
+                if ( !empty( $category_id ) ) {
+                    $id = (int)$category_id['category_id'];
+                }
+                
+                return $id;
+            } else {
+                return false;
             }
-            
-            return $id;
         }
         
         public static function createImgFolder() {
@@ -342,6 +355,19 @@
             if ( !file_exists( $dir ) ) {
                 mkdir( $dir, 0777, true );
             }
+        }
+        
+        public static function searchCatName( $cat_id, $parent_id = false ) {
+            $categories = self::$categoreis;
+            $result = '';
+//            parent_id
+            foreach ( $categories as $item ) {
+                if ( $item['id'] == $cat_id ) {
+                    $result  = $item['name'];
+                }
+            }
+            
+            return $result;
         }
         
         
