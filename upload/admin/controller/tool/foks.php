@@ -1,6 +1,8 @@
 <?php
 //    http://opencart20.loc:8888/admin/index.php?route=tool/foks&token=ecf30a52234187c91537942f764a0a13
 //    https://my.foks.biz/s/pb/f?key=498100e4-d428-42dc-96fa-ce2955dba3ed&type=yml_catalog&ext=xml
+
+//    https://my.foks.biz/s/pb/f?key=0ef8f697-eabf-46c2-81bc-5f44f30d6601&type=drop_foks&ext=xml
     class ControllerToolFoks extends Controller {
         
         private $error = array();

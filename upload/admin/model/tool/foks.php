@@ -82,7 +82,7 @@
                 } else {
                     $this->addProductImport( $product );
                 }
-                file_put_contents( DIR_APPLICATION .$this->log_folder. 'current.json', 0 );
+                file_put_contents( DIR_APPLICATION . $this->log_folder . 'current.json', $i );
                 $i++;
             }
             
@@ -245,7 +245,7 @@
             
             $this->db->query( "DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'" );
             
-            if ( isset( $data['category'] ) ) {
+            if ( isset( $data['category_id'] ) ) {
                 $this->db->query( "INSERT INTO " . DB_PREFIX . "product_to_category SET product_id = '" . (int)$product_id . "', category_id = '" . (int)$data['category_id'] . "'" );
 //                $this->db->query( "INSERT INTO " . DB_PREFIX . "product_to_category SET product_id = '" . (int)$product_id . "', category_id = '" . (int)$data['category_id'] . "', main_category = 1" );
             }
