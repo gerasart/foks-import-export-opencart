@@ -123,7 +123,8 @@
          */
         public function addProductImport( $data ) {
             $languages = $this->getLanguages();
-            
+            $load_without_img = (boolean)$this->getSetting( 'foks_img' );
+    
             $sql_q     = "INSERT INTO " . DB_PREFIX . "product SET model = '" . $this->db->escape( $data['model'] ) . "', ";
             $sql_q     .= "sku = '" . $this->db->escape( $data['sku'] ) . "', ";
             $sql_q     .= "quantity = '" . (int)$data['quantity'] . "', ";
@@ -137,7 +138,7 @@
         
             $product_id = $this->db->getLastId();
 
-            if ( isset( $data['image'] ) && !empty($data['image']) ) {
+            if ( isset( $data['image'] ) && !empty($data['image']) && !$load_without_img ) {
                 $thumb = $this->imgUrlUpload($data['image'], (int)$product_id);
                 
                 $this->db->query( "UPDATE " . DB_PREFIX . "product SET image = '" . $thumb . "' WHERE product_id = '" . (int)$product_id . "'" );
@@ -165,7 +166,7 @@
             
             }
         
-            if ( !empty( $data['images'] ) ) {
+            if ( !empty( $data['images'] ) && !$load_without_img ) {
                 foreach ( $data['images'] as $product_image ) {
                     $img = $this->imgUrlUpload($product_image, (int)$product_id);
                     $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $img . "', sort_order = '" . (int)0 . "'" );
@@ -193,7 +194,7 @@
          */
         public function UpdateProductImport( $product_id, $data ) {
             $product_id = $product_id['row'];
-            
+            $load_without_img = (boolean)$this->getSetting( 'foks_img' );
             $languages = $this->getLanguages();
             
             $sql_q = "UPDATE " . DB_PREFIX . "product SET model = '" . $this->db->escape( $data['model'] ) . "', ";
@@ -207,7 +208,7 @@
             
             $this->db->query( $sql_q );
             
-            if ( isset( $data['image'] ) && !empty($data['image']) ) {
+            if ( isset( $data['image'] ) && !empty($data['image'] && !$load_without_img) ) {
                 $thumb = $this->imgUrlUpload($data['image'], (int)$product_id);
     
                 $this->db->query( "UPDATE " . DB_PREFIX . "product SET image = '" . $thumb . "' WHERE product_id = '" . (int)$product_id . "'" );
@@ -230,7 +231,7 @@
                 
             }
             
-            if ( !empty( $data['images'] ) ) {
+            if ( !empty( $data['images'] ) && !$load_without_img ) {
                 foreach ( $data['images'] as $product_image ) {
                     $img = $this->imgUrlUpload($product_image, (int)$product_id);
                     $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $img. "', sort_order = '" . (int)1 . "'" );
