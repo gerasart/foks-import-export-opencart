@@ -1,36 +1,47 @@
-.foks_settings .statistic[data-v-14d30fd6] {
+.ant-checkbox-input {
+  display: none !important;
+}
+.ant-checkbox.ant-checkbox-checked .ant-checkbox-input {
+  display: none !important;
+}
+.progress.ant-progress {
+  overflow: visible !important;
+  -webkit-box-shadow: none !important;
+          box-shadow: none !important;
+}
+.foks_settings .statistic {
   margin-top: 30px;
 }
-.foks_settings .save_settings[data-v-14d30fd6] {
+.foks_settings .save_settings {
   background: #74bb5a;
   border: 1px solid;
 }
-.foks_settings .save_settings[data-v-14d30fd6]:hover {
+.foks_settings .save_settings:hover {
   opacity: .8;
 }
-.foks_settings .block_col[data-v-14d30fd6] {
+.foks_settings .block_col {
   padding: 30px;
 }
-.foks_settings .block_col .title[data-v-14d30fd6] {
+.foks_settings .block_col .title {
   font-weight: bold;
   font-size: 18px;
   margin-bottom: 20px;
 }
-.foks_settings .block_col .sub_title[data-v-14d30fd6] {
+.foks_settings .block_col .sub_title {
   font-weight: bold;
   margin-bottom: 10px;
 }
-.foks_settings .block_col .field-group[data-v-14d30fd6] {
+.foks_settings .block_col .field-group {
   margin-bottom: 30px;
 }
-.foks_settings .field_progress[data-v-14d30fd6] {
+.foks_settings .field_progress {
   margin-bottom: 20px;
 }
-.foks_settings .progress[data-v-14d30fd6] {
+.foks_settings .progress {
   margin-top: 30px;
   margin-left: 40px;
 }
-.foks_settings .export_block-link[data-v-14d30fd6] {
+.foks_settings .export_block-link {
   display: inline-block;
   padding: 10px;
   background: #eee;

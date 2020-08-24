@@ -14,7 +14,8 @@
           <div v-if="current_count">Loaded products: <strong>{{current_count}}</strong></div>
         </div>
         <a-progress class="progress" v-if="progress_count" :percent="+progress_count.toFixed(2)" status="active" />
-        <a-button v-if="!progress && Foks.import && !reload" type="primary" class="import_now" @click="importFoks">{{text.import}}
+        <a-button v-if="!progress && Foks.import && !reload" type="primary" class="import_now" @click="importFoks">
+          {{text.import}}
         </a-button>
         <a-button v-if="reload" @click="reloadPage">Reload page</a-button>
       </div>
@@ -22,7 +23,7 @@
       <div class="field-group">
         <div class="sub_title">{{text.update}}</div>
         You can use your server cron jobs
-
+        <br>
         <strong>Use this link</strong>
         <br>
         <code>{{locationOrigin()}}/index.php?route=tool/foks_cron</code>
@@ -54,13 +55,13 @@
           {{text.export}}
         </a>
 
-<!--        <div v-if="!export_spin" class="export_block-link stable">-->
-<!--         -->
-<!--        </div>-->
-<!--        <a-spin v-else />-->
-<!--        <hr>-->
-<!--        <a-button v-if="!export_spin" :data-url="Foks.export" type="primary" @click="ExportFoks">{{text.export_now}}-->
-<!--        </a-button>-->
+        <!--        <div v-if="!export_spin" class="export_block-link stable">-->
+        <!--         -->
+        <!--        </div>-->
+        <!--        <a-spin v-else />-->
+        <!--        <hr>-->
+        <!--        <a-button v-if="!export_spin" :data-url="Foks.export" type="primary" @click="ExportFoks">{{text.export_now}}-->
+        <!--        </a-button>-->
 
       </div>
     </a-col>
@@ -119,7 +120,7 @@
         },
         methods: {
             locationOrigin() {
-               return location.origin;
+                return location.origin;
             },
             reloadPage() {
                 location.reload()
@@ -145,7 +146,7 @@
             },
             importFoks() {
                 const request = {
-                    url: this.url+'ajaxImportFoks'+ this.token,
+                    url: this.url + 'ajaxImportFoks' + this.token,
                 };
                 this.$message.config({
                     top: '50px',
@@ -191,7 +192,7 @@
             },
             checkProgress() {
                 this.$store.dispatch('get', {url: this.logs_url + 'current.json'}).then(res => {
-                    console.log('checkProgress',res);
+                    console.log('checkProgress', res);
 
                     let current_count = res.data;
                     this.current_count = res.data;
@@ -207,7 +208,7 @@
             },
             saveSettings() {
                 const request = {
-                    url: this.url+'ajaxSaveSettings'+ this.token,
+                    url: this.url + 'ajaxSaveSettings' + this.token,
                     data: this.Foks
                 };
                 this.$message.config({
@@ -223,7 +224,22 @@
     }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
+
+  .ant-checkbox-input {
+    display: none!important;
+  }
+  .ant-checkbox.ant-checkbox-checked {
+    .ant-checkbox-input {
+      display: none!important;
+    }
+  }
+
+  .progress.ant-progress {
+    overflow: visible !important;
+    box-shadow: none !important;
+  }
+
   .foks_settings {
 
     .statistic {
