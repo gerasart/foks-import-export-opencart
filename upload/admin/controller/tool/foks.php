@@ -79,7 +79,11 @@
             $data['column_left'] = $this->load->controller( 'common/column_left' );
             $data['footer']      = $this->load->controller( 'common/footer' );
             
-            $this->response->setOutput( $this->load->view( 'tool/foks.tpl', $data ) );
+            if (!$version) {
+                $this->response->setOutput( $this->load->view( 'tool/foks.tpl', $data ) );
+            } else {
+                $this->response->setOutput( $this->load->view( 'tool/foks', $data ) );
+            }
         }
         
         
