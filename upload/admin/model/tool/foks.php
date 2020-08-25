@@ -61,7 +61,7 @@
         
             $this->db->query("INSERT INTO `" . DB_PREFIX . "category_path` SET `category_id` = '" . (int)$category_id . "', `path_id` = '" . (int)$category_id . "', `level` = '" . (int)$level . "'");
 
-//        $this->cache->delete('category');
+           $this->cache->delete('category');
 //
 //        if($this->config->get('config_seo_pro')){
 //            $this->cache->delete('seopro');

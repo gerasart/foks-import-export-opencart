@@ -185,7 +185,7 @@ module.exports = function (env) {
       return merge([
         common,
         {
-          devtool: 'source-map',
+          // devtool: 'source-map',
           output: {
             publicPath:  path.join(newRel, './dist/').replace(/\\/g, '/'),
           },
