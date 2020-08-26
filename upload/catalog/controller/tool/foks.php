@@ -69,7 +69,7 @@
             }
             $output .= '</categories>' . "\n";
             foreach ( $products as $product ) {
-                if ( $product['stock_status'] === 'В наличии' && $product['status'] ) {
+                if ( $product['status'] ) {
                     
                     $product['images'] = array();
                     
