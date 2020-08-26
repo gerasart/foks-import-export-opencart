@@ -281,6 +281,7 @@
     .progress {
       margin-top: 30px;
       margin-left: 40px;
+      margin-bottom: 30px;
     }
 
     .export_block {
