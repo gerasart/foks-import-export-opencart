@@ -104,6 +104,24 @@
                 'products'   => $this->parseProducts( $xml->shop->offers )
             ];
         }
+    
+    
+        public function parseFileCategories( $file ) {
+            set_time_limit( 0 );
+            $xmlstr = file_get_contents( $file );
+            $xml    = new \SimpleXMLElement( $xmlstr );
+            return  self::parseCategories( $xml->shop->categories );
+            
+        }
+        
+        public function parseFileProducts( $file ) {
+            set_time_limit( 0 );
+            $xmlstr = file_get_contents( $file );
+            $xml    = new \SimpleXMLElement( $xmlstr );
+            return  $this->parseProducts( $xml->shop->offers );
+        }
+        
+        
         
         /**
          * @param $categories
@@ -250,14 +268,17 @@
          */
         public function importData( $file ) {
             $this->load->model( 'tool/foks' );
-            $data          = $this->parseFile( $file );
-            $total_product = count( $data['products'] );
+//            $data          = $this->parseFile( $file );
+            $categories = $this->parseFileCategories($file);
+            $this->model_tool_foks->addCategories( $categories );
+    
+            $products = $this->parseFileProducts($file);
+            $total_product = count( $products );
             file_put_contents( DIR_APPLICATION . $this->log_folder . 'total.json', $total_product );
             
-            $this->model_tool_foks->addCategories( $data['categories'] );
-            $this->model_tool_foks->addProducts( $data['products'] );
+            $this->model_tool_foks->addProducts( $products );
             
-            return $data;
+            return $products;
         }
         
         public static function LocalVars( $data ) {
