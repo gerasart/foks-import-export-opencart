@@ -1,13 +1,13 @@
 <modification>
-	<name>Foks</name>
-	<version>1.1</version>
-	<link>https://foks.biz/</link>
-	<author>cs50.com.ua</author>
-	<code>foks</code>
-	<file path="admin/controller/common/menu.php">
-		<operation>
-			<search><![CDATA[$this->load->language('common/menu');]]></search>
-			<add position="after"><![CDATA[
+    <name>FOKS</name>
+    <version>1.2</version>
+    <link>https://foks.biz/</link>
+    <author>cs50.com.ua</author>
+    <code>foks</code>
+    <file path="admin/controller/common/menu.php">
+        <operation>
+            <search><![CDATA[$this->load->language('common/menu');]]></search>
+            <add position="after"><![CDATA[
 				$version = version_compare(VERSION, '3.0.0', '>=');
 				if (!$version) {
 				$data['foks'] = $this->url->link('tool/foks', 'token=' . $this->session->data['token'], 'SSL');
@@ -15,37 +15,37 @@
 				$data['foks'] = $this->url->link('tool/foks', 'user_token=' . $this->session->data['user_token'], 'SSL');
 				}
             ]]></add>
-		</operation>
-	</file>
-	<file path="admin/controller/common/column_left.php">
-		<operation>
-			<search><![CDATA[if ($this->user->hasPermission('access', 'tool/backup')) {]]></search>
-			<add position="after"><![CDATA[
+        </operation>
+    </file>
+    <file path="admin/controller/common/column_left.php">
+        <operation>
+            <search><![CDATA[if ($this->user->hasPermission('access', 'tool/backup')) {]]></search>
+            <add position="after"><![CDATA[
 			// opencart 3
 			$version = version_compare(VERSION, '3.0.0', '>=');
 				if (!$version) {
 				$tool[] = array(
-					'name'	   => 'Foks',
+					'name'	   => 'FOKS',
 					'href'     => $this->url->link('tool/foks', 'token=' . $this->session->data['token'], true),
 					'children' => array()
 				);
 				} else {
 				$maintenance[] = array(
-					'name'	   => 'Foks',
+					'name'	   => 'FOKS',
 					'href'     => $this->url->link('tool/foks', 'user_token=' . $this->session->data['user_token'], true),
 					'children' => array()
 				);
 				}
             ]]></add>
-		</operation>
-	</file>
+        </operation>
+    </file>
 
-	<file path="admin/view/template/common/menu.tpl">
-		<operation>
-			<search><![CDATA[<li><a href="<?php echo $upload; ?>"><?php echo $text_upload; ?></a></li>]]></search>
-			<add position="after"><![CDATA[
-				<li><a href="<?php echo $foks; ?>">Foks</a></li>
+    <file path="admin/view/template/common/menu.tpl">
+        <operation>
+            <search><![CDATA[<li><a href="<?php echo $upload; ?>"><?php echo $text_upload; ?></a></li>]]></search>
+            <add position="after"><![CDATA[
+				<li><a href="<?php echo $foks; ?>">FOKS</a></li>
             ]]></add>
-		</operation>
-	</file>
+        </operation>
+    </file>
 </modification>
