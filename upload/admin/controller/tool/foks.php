@@ -14,14 +14,14 @@
             
             $this->document->addScript( $this->dist_folder . 'scripts/vue.js' );
             $this->document->addStyle( $this->dist_folder . 'styles/vue.css' );
-            $this->document->setTitle( 'Foks import/Export' );
+            $this->document->setTitle( 'FOKS import/Export' );
             $version = version_compare( VERSION, '3.0.0', '>=' );
             
             self::createImgFolder();
             
             $this->load->model( 'tool/foks' );
             
-            $data['heading_title'] = 'Foks import/Export';
+            $data['heading_title'] = 'FOKS import/Export';
             
             if ( isset( $this->session->data['error'] ) ) {
                 $data['error_warning'] = $this->session->data['error'];
@@ -57,7 +57,7 @@
             );
             
             $data['breadcrumbs'][] = array(
-                'text' => 'Foks',
+                'text' => 'FOKS',
                 'href' => $this->url->link( 'tool/backup', "{$token_str}=" . $token, 'SSL' )
             );
 //            var_dump(version_compare(VERSION, '2.2.0', '<='));
