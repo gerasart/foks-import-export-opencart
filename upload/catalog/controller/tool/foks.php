@@ -103,7 +103,7 @@
                         $output .= '<picture>' . $pr_img['popup'] . '</picture>' . "\n";
                     }
                     $output .= '<currencyId>UAH</currencyId>' . "\n";
-                    $output .= '<quantity_in_stock>' . $product['quantity'] . '</quantity_in_stock>' . "\n";
+                    $output .= '<stock_quantity>' . $product['quantity'] . '</stock_quantity>' . "\n";
                     if ( $product['manufacturer'] ) {
                         $output .= '<vendor>' . $product['manufacturer'] . '</vendor>' . "\n";
                     }
