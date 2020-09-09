@@ -68,6 +68,9 @@
                 }
             }
             $output .= '</categories>' . "\n";
+            
+            $output .= '<offers>' . "\n";
+            
             foreach ( $products as $product ) {
                 if ( $product['status'] ) {
                     
@@ -124,6 +127,7 @@
                     $output .= '</offer>' . "\n";
                 }
             }
+            $output .= '</offers>' . "\n";
             $output .= '</shop>' . "\n";
             $output .= '</yml_catalog>';
             
