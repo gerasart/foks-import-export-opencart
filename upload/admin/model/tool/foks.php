@@ -404,13 +404,13 @@
                 mkdir($folder, 0750);
             }
         
-            $array_url = explode('.', $image_url);
-            $format = array_pop($array_url);
+            $pathinfo = pathinfo($image_url);
+            $format = $pathinfo['extension'];
             $valid = ['png', 'jpg', 'jpeg'];
             if (!in_array($format,$valid)) {
                 $format = 'jpg';
             }
-            $img_path = 'catalog/image_url/product' . $product_id . '/image-url-' . $product_id . '.' . $format;
+            $img_path = 'catalog/image_url/product' . $product_id . '/image-url-' . $product_id . '-'. $pathinfo['filename'] .'.'. $format;
             $path = DIR_IMAGE . $img_path;
             if ($result) {
                 $file = file_get_contents($image_url);
