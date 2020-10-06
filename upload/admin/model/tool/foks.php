@@ -150,6 +150,13 @@
                     $this->db->query( "INSERT INTO " . DB_PREFIX . "product_description SET product_id = '" . (int)$product_id . "', language_id = '" . (int)$lang . "', name = '" . $this->db->escape( $data['name'] ) . "', description = '" . $this->db->escape( $data['description'] ) . "',  meta_title = '', meta_description = '" . $this->db->escape( $data['description'] ) . "', meta_keyword = ''" );
                 }
             }
+            
+              $data['keyword'] = self::transliterate( (string)$data['name'] ) . '-' . $product_id;
+            
+            if ( isset( $data['keyword'] ) ) {
+                $this->db->query( "INSERT INTO " . DB_PREFIX . "url_alias SET query = 'product_id=" . (int)$product_id . "', keyword = '" . $data['keyword'] . "'" );
+            }
+
         
             if ( isset( $data['attributes'] ) && !empty($data['attributes']) ) {
             
@@ -243,6 +250,14 @@
                 foreach ( $languages as $lang ) {
                     $this->db->query( "INSERT INTO " . DB_PREFIX . "product_description SET product_id = '" . (int)$product_id . "', language_id = '" . (int)$lang . "', name = '" . $this->db->escape( $data['name'] ) . "', description = '" . $this->db->escape( $data['description'] ) . "',  meta_title = '" . $this->db->escape( $data['name'] ) . "', meta_description = '" . $this->db->escape( $data['description'] ) . "', meta_keyword = ''" );
                 }
+            }
+            
+            $this->db->query("DELETE FROM " . DB_PREFIX . "url_alias WHERE query = 'product_id=" . (int)$product_id . "'");
+            
+            $data['keyword'] = self::transliterate( (string)$data['name'] ) . '-' . $product_id;
+            
+            if ( isset( $data['keyword'] ) ) {
+                $this->db->query( "INSERT INTO " . DB_PREFIX . "url_alias SET query = 'product_id=" . (int)$product_id . "', keyword = '" . $data['keyword'] . "'" );
             }
             
             $this->db->query( "DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'" );
