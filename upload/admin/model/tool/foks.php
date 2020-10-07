@@ -239,6 +239,8 @@
                 
             }
             
+            $this->db->query("DELETE FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "'");
+            
             if ( !empty( $data['images'] ) && !$load_without_img ) {
                 foreach ( $data['images'] as $product_image ) {
                     $img = $this->imgUrlUpload($product_image, (int)$product_id);
