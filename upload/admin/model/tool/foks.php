@@ -175,9 +175,11 @@
             }
         
             if ( !empty( $data['images'] ) && !$load_without_img ) {
+                $im = 1;
                 foreach ( $data['images'] as $product_image ) {
                     $img = $this->imgUrlUpload($product_image, (int)$product_id);
-                    $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $img . "', sort_order = '" . (int)0 . "'" );
+                    $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $img . "', sort_order = '" . (int)$im . "'" );
+                    $im++;
                 }
             }
         
@@ -242,9 +244,11 @@
             $this->db->query("DELETE FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "'");
             
             if ( !empty( $data['images'] ) && !$load_without_img ) {
+                $im = 1;
                 foreach ( $data['images'] as $product_image ) {
-                    $img = $this->imgUrlUpload($product_image, (int)$product_id);
-                    $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $img. "', sort_order = '" . (int)1 . "'" );
+                    $img = $this->imgUrlUpload($product_image, (int)$product_id, true, $im);
+                    $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $img. "', sort_order = '" . (int)$im . "'" );
+                    $im++;
                 }
             }
     
@@ -412,22 +416,25 @@
             return $query->row;
         }
         
-        protected function imgUrlUpload($image_url, $product_id, $result = true)
+        protected function imgUrlUpload($image_url, $product_id, $result = true, $index = 0)
         {
             $folder = DIR_IMAGE . 'catalog/image_url/product' . $product_id;
         
-            if ($result) {
-                $this->removeImageFolder($folder);
-                mkdir($folder, 0750);
-            }
+//            if ($result) {
+//                $this->removeImageFolder($folder);
+//                mkdir($folder, 0755);
+//            }
         
-            $pathinfo = pathinfo($image_url);
-            $format = $pathinfo['extension'];
+    
+            $array_url = explode('.', $image_url);
+            $format = array_pop($array_url);
+            
             $valid = ['png', 'jpg', 'jpeg'];
             if (!in_array($format,$valid)) {
                 $format = 'jpg';
             }
-            $img_path = 'catalog/image_url/product' . $product_id . '/image-url-' . $product_id . '-'. $pathinfo['filename'] .'.'. $format;
+            $img_path = 'catalog/image_url/product' . $product_id . '/image-url-' . $product_id . '-'. $index .'.'. $format;
+            
             $path = DIR_IMAGE . $img_path;
             if ($result) {
                 $file = file_get_contents($image_url);
@@ -437,9 +444,7 @@
             if (!$image_url) {
                 $this->removeImageFolder($folder);
             }
-//            var_dump(str_replace(DIR_IMAGE, '/image/', $path));
-//            var_dump(DIR_IMAGE);
-//            return str_replace(DIR_IMAGE, '/image/', $path);
+            
             return $img_path;
         }
     
