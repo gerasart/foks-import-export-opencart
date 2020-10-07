@@ -147,7 +147,7 @@
         
             if ( isset($data['description']) && !empty($data['description']) ) {
                 foreach ( $languages as $lang ) {
-                    $this->db->query( "INSERT INTO " . DB_PREFIX . "product_description SET product_id = '" . (int)$product_id . "', language_id = '" . (int)$lang . "', name = '" . $this->db->escape( $data['name'] ) . "', description = '" . $this->db->escape( $data['description'] ) . "',  meta_title = '', meta_description = '" . $this->db->escape( $data['description'] ) . "', meta_keyword = ''" );
+                    $this->db->query( "INSERT INTO " . DB_PREFIX . "product_description SET product_id = '" . (int)$product_id . "', language_id = '" . (int)$lang . "', name = '" . $this->db->escape( $data['name'] ) . "', description = '" . $this->db->escape( $data['description'] ) . "',  meta_title =  '" . $this->db->escape( $data['name'] ) . "', meta_description = '" . $this->db->escape( $data['description'] ) . "', meta_keyword = ''" );
                 }
             }
             
