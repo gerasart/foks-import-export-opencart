@@ -177,7 +177,7 @@
             if ( !empty( $data['images'] ) && !$load_without_img ) {
                 $im = 1;
                 foreach ( $data['images'] as $product_image ) {
-                    $img = $this->imgUrlUpload($product_image, (int)$product_id, $im);
+                    $img = $this->imgUrlUpload($product_image, (int)$product_id, true , $im);
                     $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $img . "', sort_order = '" . (int)$im . "'" );
                     $im++;
                 }
