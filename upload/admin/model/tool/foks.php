@@ -416,7 +416,7 @@
             return $query->row;
         }
         
-        protected function imgUrlUpload($image_url, $product_id, $result = true, $index = 0)
+        protected function imgUrlUpload($image_url, $product_id, $result = true, $index = 'x')
         {
             $folder = DIR_IMAGE . 'catalog/image_url/product' . $product_id;
         
