@@ -191,15 +191,19 @@
                 
                 $product_images = [];
                 $attributes     = [];
-                $pictures       = isset( $offer->picture ) ? $offer->picture : 0;
-                $thumb_product = $pictures;
-                if ( count( $pictures ) > 1 ) {
-                    //unset( $pictures[0] );
-                    foreach ( $pictures as $picture ) {
-                        $product_images[] = (string)$picture;
-                    }
-                }
+                $thumb_product = '';
+                $isMainImageSet = false;
                 
+                
+                foreach ($offer->picture as $image) {
+					if(!$isMainImageSet) { //main image
+						$thumb_product = $image;
+						$isMainImageSet = true;
+					}else{ //additional images
+						array_push($product_images, $image);
+					}
+				}
+   
                 $productName = (string)$offer->name;
                 
                 if ( !$productName ) {
@@ -246,7 +250,7 @@
                     'category_id'     => $this->getCategoryId( $category_name ),
                     'parent_category' => '',
                     'description'     => $product_description,
-                    'image'           => !empty($thumb_product) ? (string)$thumb_product[0] : '',
+                    'image'           => $thumb_product,
                     'images'          => $product_images,
                     'date_available'  => date( 'Y-m-d' ),
                     'manufacturer_id' => $this->getManufacturerId( $manufacturer ),
