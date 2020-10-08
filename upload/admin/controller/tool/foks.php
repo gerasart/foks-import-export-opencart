@@ -192,6 +192,7 @@
                 $product_images = [];
                 $attributes     = [];
                 $pictures       = isset( $offer->picture ) ? $offer->picture : 0;
+                $thumb_product = $pictures;
                 if ( count( $pictures ) > 1 ) {
                     unset( $pictures[0] );
                     foreach ( $pictures as $picture ) {
@@ -245,7 +246,7 @@
                     'category_id'     => $this->getCategoryId( $category_name ),
                     'parent_category' => '',
                     'description'     => $product_description,
-                    'image'           => isset( $offer->picture[0] ) ? $offer->picture[0] : '',
+                    'image'           => !empty($thumb_product) ? (string)$thumb_product[0] : '',
                     'images'          => $product_images,
                     'date_available'  => date( 'Y-m-d' ),
                     'manufacturer_id' => $this->getManufacturerId( $manufacturer ),
