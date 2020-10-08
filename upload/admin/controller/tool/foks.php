@@ -194,7 +194,7 @@
                 $pictures       = isset( $offer->picture ) ? $offer->picture : 0;
                 $thumb_product = $pictures;
                 if ( count( $pictures ) > 1 ) {
-                    unset( $pictures[0] );
+                    //unset( $pictures[0] );
                     foreach ( $pictures as $picture ) {
                         $product_images[] = (string)$picture;
                     }
