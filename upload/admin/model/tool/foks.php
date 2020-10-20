@@ -420,9 +420,11 @@
         {
             $folder = DIR_IMAGE . 'catalog/image_url/product' . $product_id;
         
+            
            if ($result) {
                //$this->removeImageFolder($folder);
-               mkdir($folder, 0777);
+               self::createImgFolder($folder);
+              // mkdir($folder, 0777);
            }
         
     
@@ -518,6 +520,13 @@
             
             return $attribute_group_id;
     
+        }
+        
+        
+          public static function createImgFolder($dir) {
+            if ( !file_exists( $dir ) ) {
+                mkdir( $dir, 0777, true );
+            }
         }
         
     }
