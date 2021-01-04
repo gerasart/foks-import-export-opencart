@@ -98,7 +98,7 @@
                         $thumb = '';
                     }
                     $output .= '<offer id="' . $product['product_id'] . '" available="true">' . "\n";
-                    $output .= '<name>' . $product['name'] . '</name>' . "\n";
+                    $output .= '<name>' . htmlspecialchars($product['name']) . '</name>' . "\n";
                     $output .= '<price>' . $price . '</price>' . "\n";
                     $output .= '<categoryId>' . $cat . '</categoryId>' . "\n";
                     $output .= '<picture>' . $thumb . '</picture>' . "\n";
@@ -108,7 +108,7 @@
                     $output .= '<currencyId>UAH</currencyId>' . "\n";
                     $output .= '<stock_quantity>' . $product['quantity'] . '</stock_quantity>' . "\n";
                     if ( $product['manufacturer'] ) {
-                        $output .= '<vendor>' . $product['manufacturer'] . '</vendor>' . "\n";
+                        $output .= '<vendor>' . htmlspecialchars($product['manufacturer']) . '</vendor>' . "\n";
                     }
 //                        $output .= '<country>Украина</country>' . "\n";
                     $output .= '<description>' . htmlspecialchars( $product['description'] ) . "\n";
@@ -117,7 +117,7 @@
                         foreach ( $attributes as $attr ) {
                             if ( $attr['attribute'] && count( $attr ) ) {
                                 foreach ($attr['attribute'] as  $item) {
-                                    $output  .= "<param name=\"{$item['name']}\">{$item['text']}</param>";
+                                    $output  .= "<param name=\"".htmlspecialchars($item['name'])."\">".htmlspecialchars($item['text'])."</param>";
                                 }
                             }
                         }

@@ -1,19 +1,28 @@
 <?php
-//    http://opencart20.loc:8888/admin/index.php?route=tool/foks&token=ecf30a52234187c91537942f764a0a13
-//    https://my.foks.biz/s/pb/f?key=498100e4-d428-42dc-96fa-ce2955dba3ed&type=yml_catalog&ext=xml
 
-//    https://my.foks.biz/s/pb/f?key=0ef8f697-eabf-46c2-81bc-5f44f30d6601&type=drop_foks&ext=xml
     class ControllerToolFoks extends Controller {
         
-        private $error = array();
-        private $log_folder = 'view/javascript/app/logs/';
-        private $dist_folder = '/admin/view/javascript/app/dist/';
+        const LOG_FOLDER = 'view/javascript/app/logs/';
+        
+        const DIST_FOLDER = '/admin/view/javascript/app/dist/';
+        
+        /**
+         * @var array
+         */
         private static $categoreis = [];
         
+        /**
+         * @var array
+         */
+        private $error = array();
+        
+        /**
+         * Return settings for admin panel
+         *
+         */
         public function index() {
-            
-            $this->document->addScript( $this->dist_folder . 'scripts/vue.js' );
-            $this->document->addStyle( $this->dist_folder . 'styles/vue.css' );
+            $this->document->addScript( self::DIST_FOLDER . 'scripts/vue.js' );
+            $this->document->addStyle( self::DIST_FOLDER . 'styles/vue.css' );
             $this->document->setTitle( 'FOKS import/Export' );
             $version = version_compare( VERSION, '3.0.0', '>=' );
             
@@ -60,21 +69,20 @@
                 'text' => 'FOKS',
                 'href' => $this->url->link( 'tool/backup', "{$token_str}=" . $token, 'SSL' )
             );
-//            var_dump(version_compare(VERSION, '2.2.0', '<='));
+            
             $file = str_replace( "&amp;", '&', $this->model_tool_foks->getSetting( 'foks_import_url' ) );
             
             $foks_settings['foks'] = [
-                'import'   => $file, //url
+                'import'   => $file,
                 'img'      => (boolean)$this->model_tool_foks->getSetting( 'foks_img' ), //import with img
-                'logs_url' => $this->log_folder, //folder url
-                'update'   => '', //cron settings
+                'logs_url' => self::LOG_FOLDER,
+                'update'   => '',
                 'token'    => $token,
                 'version3' => $version,
             ];
             
-            file_put_contents( DIR_APPLICATION . $this->log_folder . 'total.json', 0 );
-            file_put_contents( DIR_APPLICATION . $this->log_folder . 'current.json', 0 );
-            
+            file_put_contents( DIR_APPLICATION . self::LOG_FOLDER . 'total.json', 0 );
+            file_put_contents( DIR_APPLICATION . self::LOG_FOLDER . 'current.json', 0 );
             
             $data['local_vars'] = self::LocalVars( $foks_settings );
             
@@ -104,13 +112,13 @@
                 'products'   => $this->parseProducts( $xml->shop->offers )
             ];
         }
-    
-    
+        
+        
         public function parseFileCategories( $file ) {
             set_time_limit( 0 );
             $xmlstr = file_get_contents( $file );
             $xml    = new \SimpleXMLElement( $xmlstr );
-            return  self::parseCategories( $xml->shop->categories );
+            return self::parseCategories( $xml->shop->categories );
             
         }
         
@@ -118,9 +126,8 @@
             set_time_limit( 0 );
             $xmlstr = file_get_contents( $file );
             $xml    = new \SimpleXMLElement( $xmlstr );
-            return  $this->parseProducts( $xml->shop->offers );
+            return $this->parseProducts( $xml->shop->offers );
         }
-        
         
         
         /**
@@ -173,11 +180,12 @@
                 }
                 
             }
-            
             return $cat_name;
         }
         
         /**
+         * Convert from xml to array
+         *
          * @param $offers
          * @return array
          */
@@ -191,19 +199,19 @@
                 
                 $product_images = [];
                 $attributes     = [];
-                $thumb_product = '';
+                $thumb_product  = '';
                 $isMainImageSet = false;
                 
                 
-                foreach ($offer->picture as $image) {
-					if(!$isMainImageSet) { //main image
-						$thumb_product = $image;
-						$isMainImageSet = true;
-					}else{ //additional images
-						array_push($product_images, $image);
-					}
-				}
-   
+                foreach ( $offer->picture as $image ) {
+                    if ( !$isMainImageSet ) {
+                        $thumb_product  = $image;
+                        $isMainImageSet = true;
+                    } else {
+                        array_push( $product_images, $image );
+                    }
+                }
+                
                 $productName = (string)$offer->name;
                 
                 if ( !$productName ) {
@@ -236,7 +244,7 @@
                 
                 
                 if ( empty( $category_name ) ) {
-                    $category_name = self::searchCatName($id_category);
+                    $category_name = self::searchCatName( $id_category );
                 }
                 
                 $data = array(
@@ -258,34 +266,38 @@
                     'status'          => '0',
                     'attributes'      => $this->model_tool_foks->addAttributes( $attributes ),
                 );
-
-//                var_dump($data);
+                
                 $result[ $i ] = $data;
                 
             }
             return $result;
         }
         
+        
         /**
          * @param $file
-         * @return array|\SimpleXMLElement
-         * @throws \Exception
+         * @return array
          */
         public function importData( $file ) {
             $this->load->model( 'tool/foks' );
-//            $data          = $this->parseFile( $file );
-            $categories = $this->parseFileCategories($file);
+            $categories = $this->parseFileCategories( $file );
             $this->model_tool_foks->addCategories( $categories );
-    
-            $products = $this->parseFileProducts($file);
+            
+            $products      = $this->parseFileProducts( $file );
             $total_product = count( $products );
-            file_put_contents( DIR_APPLICATION . $this->log_folder . 'total.json', $total_product );
+            file_put_contents( DIR_APPLICATION . self::LOG_FOLDER . 'total.json', $total_product );
             
             $this->model_tool_foks->addProducts( $products );
             
             return $products;
         }
         
+        /**
+         * Scripts for admin panel
+         *
+         * @param $data
+         * @return string
+         */
         public static function LocalVars( $data ) {
             $html = '';
             
@@ -303,6 +315,10 @@
             return $html;
         }
         
+        /**
+         * Save settings in admin panel
+         *
+         */
         public function ajaxSaveSettings() {
             $post = $this->request->post;
             
@@ -318,9 +334,11 @@
             $this->response->setOutput( json_encode( $json ) );
         }
         
+        /**
+         * Import products from xml
+         *
+         */
         public function ajaxImportFoks() {
-//            file_put_contents( DIR_APPLICATION . $this->log_folder . 'total.json', 0 );
-//            file_put_contents( DIR_APPLICATION . $this->log_folder . 'current.json', 0 );
             $this->load->model( 'tool/foks' );
             
             $file_x = $this->model_tool_foks->getSetting( 'foks_import_url' );
@@ -329,8 +347,8 @@
             $data = [];
             if ( $file ) {
                 $xml = file_get_contents( $file );
-                file_put_contents( DIR_APPLICATION . $this->log_folder . 'foks_import.xml', $xml );
-                $file_path = DIR_APPLICATION . $this->log_folder . 'foks_import.xml';
+                file_put_contents( DIR_APPLICATION . self::LOG_FOLDER . 'foks_import.xml', $xml );
+                $file_path = DIR_APPLICATION . self::LOG_FOLDER . 'foks_import.xml';
                 $data      = $this->importData( $file_path );
             }
             
@@ -338,6 +356,12 @@
             $this->response->setOutput( json_encode( $data ) );
         }
         
+        /**
+         * Get manufacturer id
+         *
+         * @param $name
+         * @return false|mixed
+         */
         public function getManufacturerId( $name ) {
             if ( !empty( $name ) ) {
                 $this->load->model( 'tool/foks' );
@@ -358,6 +382,12 @@
             return false;
         }
         
+        /**
+         * Get category id
+         *
+         * @param $name
+         * @return false|int
+         */
         public function getCategoryId( $name ) {
             if ( !empty( $name ) ) {
                 $this->load->model( 'tool/foks' );
@@ -375,26 +405,36 @@
             }
         }
         
+        /**
+         * Create image folder
+         *
+         */
         public static function createImgFolder() {
             $dir = DIR_IMAGE . 'catalog/image_url';
             
             if ( !file_exists( $dir ) ) {
                 mkdir( $dir, 0777, true );
             }
+            
         }
         
+        /**
+         * Search category name from id
+         *
+         * @param $cat_id
+         * @param false $parent_id
+         * @return mixed|string
+         */
         public static function searchCatName( $cat_id, $parent_id = false ) {
             $categories = self::$categoreis;
-            $result = '';
-//            parent_id
+            $result     = '';
             foreach ( $categories as $item ) {
                 if ( $item['id'] == $cat_id ) {
-                    $result  = $item['name'];
+                    $result = $item['name'];
                 }
             }
             
             return $result;
         }
-        
         
     }
