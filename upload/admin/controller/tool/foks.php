@@ -286,8 +286,12 @@
             $products      = $this->parseFileProducts( $file );
             $total_product = count( $products );
             file_put_contents( DIR_APPLICATION . self::LOG_FOLDER . 'total.json', $total_product );
-            
-            $this->model_tool_foks->addProducts( $products );
+    
+            try {
+                $this->model_tool_foks->addProducts( $products );
+            } catch (\Exception $e) {
+                return [$e->getMessage()];
+            }
             
             return $products;
         }
@@ -349,7 +353,11 @@
                 $xml = file_get_contents( $file );
                 file_put_contents( DIR_APPLICATION . self::LOG_FOLDER . 'foks_import.xml', $xml );
                 $file_path = DIR_APPLICATION . self::LOG_FOLDER . 'foks_import.xml';
-                $data      = $this->importData( $file_path );
+                try {
+                    $data  = $this->importData( $file_path );
+                } catch (\Exception $e) {
+                    $this->response->setOutput( json_encode( $e->getMessage() ) );
+                }
             }
             
             $this->response->addHeader( 'Content-Type: application/json' );

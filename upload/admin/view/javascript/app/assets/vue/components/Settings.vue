@@ -164,7 +164,7 @@
                 }).catch(error => {
                     this.progress = false;
                     this.error = true;
-                    console.log(error);
+                    console.log('error',error);
                     this.$message.error({content: 'Error'});
                 });
 

@@ -258,7 +258,7 @@
                 }
             }
             
-            $this->db->query("DELETE FROM " . DB_PREFIX . "url_alias WHERE query = 'product_id=" . (int)$product_id . "'");
+//            $this->db->query("DELETE FROM " . DB_PREFIX . "url_alias WHERE query = 'product_id=" . (int)$product_id . "'");
             
 //             $data['keyword'] = self::transliterate( (string)$data['name'] ) . '-' . $product_id;
             
