@@ -1,22 +1,31 @@
 <?php
-    
+
     class ControllerToolFoksCron extends Controller {
         private $dir;
         private static $total;
         private static $categoreis = [];
         private static $status = 'waiting...';
         private $log_folder = 'view/javascript/app/logs/';
-    
+
+        /**
+         * @throws Exception
+         */
         public function index() {
             $this->dir = str_replace( 'catalog', 'admin', DIR_APPLICATION );
             echo 'starting..';
-            $this->ImportFoksCron();
+
+            try {
+                $this->ImportFoksCron();
+            } catch (\Exception $e) {
+                self::$status = $e->getMessage();
+            }
+
             echo "<br>";
-            echo 'Total: '.self::$total;
+            echo 'Total: ' . self::$total;
             echo "<br>";
-            echo 'Status: '.self::$status;
+            echo 'Status: ' . self::$status;
         }
-        
+
         /**
          * @param $file
          * @return array|\SimpleXMLElement
@@ -31,7 +40,7 @@
                 'products'   => $this->parseProducts( $xml->shop->offers )
             ];
         }
-    
+
         /**
          * @param $categories
          * @return array
@@ -59,10 +68,10 @@
                 $categories_result[] = $item;
                 self::$categoreis[]  = $item;
             }
-        
+
             return $categories_result;
         }
-        
+
         /**
          * @param $categoriesList
          * @param $parent_id
@@ -80,12 +89,12 @@
                         $cat_name = $cat['name'];
                     }
                 }
-                
+
             }
-            
+
             return $cat_name;
         }
-    
+
         /**
          * @param $offers
          * @return array
@@ -94,55 +103,62 @@
             $this->load->model( 'tool/foks_cron' );
             $n      = count( $offers->offer );
             $result = [];
+
             for ( $i = 0; $i < $n; $i++ ) {
-            
+
                 $offer = $offers->offer[ $i ];
-            
+
                 $product_images = [];
                 $attributes     = [];
-                $pictures       = isset( $offer->picture ) ? $offer->picture : 0;
-                if ( count( $pictures ) > 1 ) {
-                    unset( $pictures[0] );
-                    foreach ( $pictures as $picture ) {
-                        $product_images[] = (string)$picture;
+                $thumb_product  = '';
+                $isMainImageSet = false;
+
+                foreach ( $offer->picture as $image ) {
+                    if ( !$isMainImageSet ) {
+                        $thumb_product  = $image;
+                        $isMainImageSet = true;
+                    } else {
+                        array_push( $product_images, $image );
                     }
                 }
-            
+
                 $productName = (string)$offer->name;
-            
+
                 if ( !$productName ) {
+
                     if ( isset( $offer->typePrefix ) ) {
                         $productName = (string)$offer->typePrefix . ' ' . (string)$offer->model;
                     } else {
                         $productName = (string)$offer->model;
                     }
+
                 }
-            
+
                 if ( isset( $offer->param ) ) {
                     $params = $offer->param;
-                
+
                     foreach ( $params as $param ) {
                         $attr_name  = (string)$param['name'];
                         $attr_value = (string)$param;
-                    
+
                         $attributes[] = [
                             'name'  => $attr_name,
                             'value' => $attr_value
                         ];
                     }
                 }
-            
+
                 $id_category         = (string)$offer->categoryId;
                 $product_description = isset( $offer->description ) ? (string)$offer->description : '';
                 $category_name       = isset( $offer->category ) ? (string)$offer->category : '';
                 $manufacturer        = isset( $offer->vendor ) ? (string)$offer->vendor : '';
                 $price_old           = isset( $offer->price_old ) ? (float)$offer->price_old : '';
-            
-            
+
+
                 if ( empty( $category_name ) ) {
-                    $category_name = self::searchCatName($id_category);
+                    $category_name = self::searchCatName( $id_category );
                 }
-            
+
                 $data = array(
                     'name'            => $productName,
                     'price'           => isset( $offer->price ) ? (float)$offer->price : '',
@@ -154,7 +170,7 @@
                     'category_id'     => $this->getCategoryId( $category_name ),
                     'parent_category' => '',
                     'description'     => $product_description,
-                    'image'           => isset( $offer->picture[0] ) ? $offer->picture[0] : '',
+                    'image'           => $thumb_product,
                     'images'          => $product_images,
                     'date_available'  => date( 'Y-m-d' ),
                     'manufacturer_id' => $this->getManufacturerId( $manufacturer ),
@@ -164,12 +180,15 @@
                 );
 
                 $result[ $i ] = $data;
-            
+
             }
+
             return $result;
         }
-        
+
         /**
+         * Helper for import data.
+         *
          * @param $file
          * @return array|\SimpleXMLElement
          * @throws \Exception
@@ -178,32 +197,42 @@
             $this->load->model( 'tool/foks_cron' );
             $data          = $this->parseFile( $file );
             $total_product = count( $data['products'] );
-             self::$total = $total_product;
-            
+            self::$total   = $total_product;
+
             $this->model_tool_foks_cron->addCategories( $data['categories'] );
             $this->model_tool_foks_cron->addProducts( $data['products'] );
-            
+
             self::$status = 'done';
-            
+
             return $data;
         }
-        
+
+        /**
+         * Import data products.
+         *
+         * @throws Exception
+         */
         public function ImportFoksCron() {
+
             $this->load->model( 'tool/foks_cron' );
-            
+
             $file_x = $this->model_tool_foks_cron->getSetting( 'foks_import_url' );
             $file   = str_replace( "&amp;", '&', $file_x );
-            
+
             if ( $file ) {
                 $xml = file_get_contents( $file );
-                file_put_contents( $this->dir . '/' .$this->log_folder. 'foks_import.xml', $xml );
-                $file_path = $this->dir .$this->log_folder. 'foks_import.xml';
+                file_put_contents( $this->dir . '/' . $this->log_folder . 'foks_import.xml', $xml );
+                $file_path = $this->dir . $this->log_folder . 'foks_import.xml';
                 $this->importData( $file_path );
             }
         }
-    
+
+        /**
+         * @param $name
+         * @return false|mixed
+         */
         public function getManufacturerId( $name ) {
-            
+
             if ( !empty( $name ) ) {
                 $this->load->model( 'tool/foks_cron' );
                 $data         = [
@@ -222,32 +251,41 @@
             }
             return false;
         }
-        
-        
+
+
+        /**
+         * @param $name
+         * @return false|int
+         */
         public function getCategoryId( $name ) {
             $this->load->model( 'tool/foks_cron' );
-            
+
             $id          = false;
             $category_id = $this->model_tool_foks_cron->isCategory( $name );
-            
+
             if ( !empty( $category_id ) ) {
                 $id = (int)$category_id['category_id'];
             }
-            
+
             return $id;
         }
-    
+
+        /**
+         * @param $cat_id
+         * @param false $parent_id
+         * @return mixed|string
+         */
         public static function searchCatName( $cat_id, $parent_id = false ) {
             $categories = self::$categoreis;
-            $result = '';
-//            parent_id
+            $result     = '';
+
             foreach ( $categories as $item ) {
                 if ( $item['id'] == $cat_id ) {
-                    $result  = $item['name'];
+                    $result = $item['name'];
                 }
             }
-        
+
             return $result;
         }
-        
+
     }

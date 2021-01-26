@@ -1,5 +1,5 @@
 <?php
-    
+
     class ModelToolFoks extends Model {
 
         private $log_folder = 'view/javascript/app/logs/';
@@ -56,7 +56,7 @@
 
             foreach ($query->rows as $result) {
                 $this->db->query("INSERT INTO `" . DB_PREFIX . "category_path` SET `category_id` = '" . (int)$category_id . "', `path_id` = '" . (int)$result['path_id'] . "', `level` = '" . (int)$level . "'");
-            
+
                 $level++;
             }
 
@@ -101,12 +101,6 @@
             $mysql_request = "INSERT INTO {$prefix}manufacturer SET name = '{$res_data['name']}'";
             $this->db->query($mysql_request);
             $manufacturer_id = $this->db->getLastId();
-//            $this->db->query( "INSERT INTO " . DB_PREFIX . "manufacturer_to_layout SET manufacturer_id = '" . (int)$manufacturer_id . "', store_id = '" . (int)0 . "', layout_id = '" . (int)0 . "'" );
-//
-//            if ( isset( $data['image'] ) ) {
-//                $this->db->query( "UPDATE " . DB_PREFIX . "manufacturer SET image = '" . $this->db->escape( $data['image'] ) . "' WHERE manufacturer_id = '" . (int)$manufacturer_id . "'" );
-//            }
-//            $this->db->query( "INSERT INTO " . DB_PREFIX . "manufacturer_to_store SET manufacturer_id = '" . (int)$manufacturer_id . "', store_id = '" . (int)0 . "'" );
             $this->cache->delete( 'manufacturer' );
 
             return $manufacturer_id;
@@ -136,7 +130,7 @@
 
             if ( isset( $data['image'] ) && !empty($data['image']) && !$load_without_img ) {
                 $thumb = $this->imgUrlUpload($data['image'], (int)$product_id);
-                
+
                 $this->db->query( "UPDATE " . DB_PREFIX . "product SET image = '" . $thumb . "' WHERE product_id = '" . (int)$product_id . "'" );
             }
 
@@ -145,25 +139,21 @@
                     $this->db->query( "INSERT INTO " . DB_PREFIX . "product_description SET product_id = '" . (int)$product_id . "', language_id = '" . (int)$lang . "', name = '" . $this->db->escape( $data['name'] ) . "', description = '" . $this->db->escape( $data['description'] ) . "',  meta_title =  '" . $this->db->escape( $data['name'] ) . "', meta_description = '" . $this->db->escape( $data['description'] ) . "', meta_keyword = ''" );
                 }
             }
-//             $data['keyword'] = self::transliterate( (string)$data['name'] ) . '-' . $product_id;
-//             if ( isset( $data['keyword'] ) ) {
-//                 $this->db->query( "INSERT INTO " . DB_PREFIX . "url_alias SET query = 'product_id=" . (int)$product_id . "', keyword = '" . $data['keyword'] . "'" );
-//             }
             if ( isset( $data['attributes'] ) && !empty($data['attributes']) ) {
-                
+
                 foreach ( $data['attributes'] as $attr_id => $attr_id_val ) {
 
                     foreach ( $languages as $lang ) {
                         $this->db->query( "DELETE FROM " . DB_PREFIX . "product_attribute WHERE product_id = '" . (int)$product_id . "' AND attribute_id = '" . (int)$attr_id . "' AND language_id = '" . (int)$lang . "'" );
                     }
-    
+
                     foreach ( $languages as $lang ) {
                         $this->db->query( "INSERT INTO " . DB_PREFIX . "product_attribute SET product_id = '" . (int)$product_id . "', attribute_id = '" . (int)$attr_id . "', language_id = '" . (int)$lang . "', text = '" . $this->db->escape( $attr_id_val ) . "'" );
-    
+
                     }
-                    
+
                 }
-                
+
             }
 
             if ( !empty( $data['images'] ) && !$load_without_img ) {
@@ -213,7 +203,7 @@
 
             if ( isset( $data['image'] ) && !empty($data['image'] && !$load_without_img) ) {
                 $thumb = $this->imgUrlUpload($data['image'], (int)$product_id);
-    
+
                 $this->db->query( "UPDATE " . DB_PREFIX . "product SET image = '" . $thumb . "' WHERE product_id = '" . (int)$product_id . "'" );
             }
 
@@ -221,17 +211,19 @@
             $this->db->query( "DELETE FROM " . DB_PREFIX . "product_attribute WHERE product_id = '" . (int)$product_id . "'" );
 
             if ( isset( $data['attributes'] ) && !empty($data['attributes']) ) {
-                
+
                 foreach ( $data['attributes'] as $attr_id => $attr_id_val ) {
-                    // Removes duplicates
+
                     foreach ( $languages as $lang ) {
                         $this->db->query( "DELETE FROM " . DB_PREFIX . "product_attribute WHERE product_id = '" . (int)$product_id . "' AND attribute_id = '" . (int)$attr_id . "' AND language_id = '" . (int)$lang . "'" );
                     }
+
                     foreach ( $languages as $lang ) {
                         $this->db->query( "INSERT INTO " . DB_PREFIX . "product_attribute SET product_id = '" . (int)$product_id . "', attribute_id = '" . (int)$attr_id . "', language_id = '" . (int)$lang . "', text = '" . $this->db->escape( $attr_id_val ) . "'" );
                     }
+
                 }
-                
+
             }
 
             $this->db->query("DELETE FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "'");
@@ -250,22 +242,15 @@
                     $this->db->query( "INSERT INTO " . DB_PREFIX . "product_description SET product_id = '" . (int)$product_id . "', language_id = '" . (int)$lang . "', name = '" . $this->db->escape( $data['name'] ) . "', description = '" . $this->db->escape( $data['description'] ) . "',  meta_title = '" . $this->db->escape( $data['name'] ) . "', meta_description = '" . $this->db->escape( $data['description'] ) . "', meta_keyword = ''" );
                 }
             }
-//            $this->db->query("DELETE FROM " . DB_PREFIX . "url_alias WHERE query = 'product_id=" . (int)$product_id . "'");
-            
-//             $data['keyword'] = self::transliterate( (string)$data['name'] ) . '-' . $product_id;
-            
-//             if ( isset( $data['keyword'] ) ) {
-//                 $this->db->query( "INSERT INTO " . DB_PREFIX . "url_alias SET query = 'product_id=" . (int)$product_id . "', keyword = '" . $data['keyword'] . "'" );
-//             }
+
             $this->db->query( "DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'" );
 
             if ( isset( $data['category_id'] ) ) {
                 $this->db->query( "INSERT INTO " . DB_PREFIX . "product_to_category SET product_id = '" . (int)$product_id . "', category_id = '" . (int)$data['category_id'] . "'" );
-//                $this->db->query( "INSERT INTO " . DB_PREFIX . "product_to_category SET product_id = '" . (int)$product_id . "', category_id = '" . (int)$data['category_id'] . "', main_category = 1" );
             }
 
             $this->cache->delete( 'product' );
-            
+
             if ( $this->config->get( 'config_seo_pro' ) ) {
                 $this->cache->delete( 'seopro' );
             }
@@ -277,16 +262,12 @@
          * @return string|string[]
          */
         public static function transliterate( $str ) {
-            // переводим в транслит
             $str = self::rus2translit( $str );
-            // в нижний регистр
             $str = strtolower( $str );
-            // заменям все ненужное нам на "-"
             $str = preg_replace( '~[^-a-z0-9_]+~u', '-', $str );
-            // удаляем начальные и конечные '-'
             $str    = trim( $str, "-" );
             $result = str_replace( '---', '-', $str );
-            
+
             return $result;
         }
 
@@ -307,7 +288,7 @@
                 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch',
                 'ь' => '\'', 'ы' => 'y', 'ъ' => '\'',
                 'э' => 'e', 'ю' => 'yu', 'я' => 'ya',
-                
+
                 'А' => 'A', 'Б' => 'B', 'В' => 'V',
                 'Г' => 'G', 'Д' => 'D', 'Е' => 'E',
                 'Ё' => 'E', 'Ж' => 'Zh', 'З' => 'Z',
@@ -358,9 +339,9 @@
         public function getProductByUniqueId( $unique_id ) {
             $sql = "SELECT product_id as row FROM " . DB_PREFIX . "product ";
             $sql .= "WHERE model ='{$unique_id}' LIMIT 1";
-        
+
             $query = $this->db->query( $sql );
-        
+
             return $query->row;
         }
 
@@ -392,7 +373,7 @@
          */
         public function isCategory( $name ) {
             $query = $this->db->query( "SELECT DISTINCT category_id  FROM " . DB_PREFIX . "category_description WHERE name = '" . $name . "'" );
-            
+
             return $query->row;
         }
 
@@ -404,22 +385,22 @@
          */
         public function isManufacturer( $manufacturer_name ) {
             $query = $this->db->query( "SELECT DISTINCT manufacturer_id FROM " . DB_PREFIX . "manufacturer WHERE name = '" . $manufacturer_name . "'" );
-        
+
             return $query->row;
         }
 
         public function isAttrGroup( $attr_name ) {
             $query = $this->db->query( "SELECT DISTINCT attribute_group_id FROM " . DB_PREFIX . "attribute_group_description WHERE name = '" . $attr_name . "'" );
-        
+
             return $query->row;
         }
 
         public function isAttribute($data) {
             $query = $this->db->query( "SELECT DISTINCT attribute_id FROM " . DB_PREFIX . "attribute_description WHERE name = '" . $data['name'] . "'" );
-    
+
             return $query->row;
         }
-    
+
         /**
          * Upload image from url
          *
@@ -434,9 +415,7 @@
             $folder = DIR_IMAGE . 'catalog/image_url/product' . $product_id;
 
            if ($result) {
-               //$this->removeImageFolder($folder);
                self::createImgFolder($folder);
-              // mkdir($folder, 0777);
            }
 
             $array_url = explode('.', $image_url);
@@ -490,7 +469,7 @@
             $this->db->query( "INSERT INTO " . DB_PREFIX . "attribute SET attribute_group_id = '" . (int)$attr_group_id . "'" );
             $attribute_id = $this->db->getLastId();
             $languages = $this->getLanguages();
-            
+
             foreach ( $languages as $language_id ) {
                 $this->db->query( "INSERT INTO " . DB_PREFIX . "attribute_description SET attribute_id = '" . (int)$attribute_id . "', language_id = '" .(int)$language_id . "', name = '".$attribute['name']."'" );
             }
@@ -529,7 +508,7 @@
                     } else {
                         $attr                           = $this->addAttribute( $attribute, $attr_group_id );
                         $attrs[ $attr['attribute_id'] ] = $attribute['value'];
-            
+
                     }
                 }
             }
@@ -548,9 +527,9 @@
 
             if (!$is_attr) {
                 $this->db->query( "INSERT INTO " . DB_PREFIX . "attribute_group SET sort_order = '1'" );
-    
+
                 $attribute_group_id = $this->db->getLastId();
-    
+
                 foreach ( $languages as $language_id ) {
                     $this->db->query( "INSERT INTO " . DB_PREFIX . "attribute_group_description SET attribute_group_id = '" . (int)$attribute_group_id . "', language_id = '" . (int)$language_id . "', name = 'Foks'" );
                 }
@@ -567,10 +546,10 @@
          * @param $dir
          */
         public static function createImgFolder( $dir) {
-            
+
             if ( !file_exists( $dir ) ) {
                 mkdir( $dir, 0777, true );
             }
-            
+
         }
     }
