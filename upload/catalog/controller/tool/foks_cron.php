@@ -49,10 +49,13 @@
             $categoriesList   = array();
             $data             = $categories->category;
             self::$categoreis = [];
+            $categories_result = [];
+
             foreach ( $data as $category ) {
+                $categoryName     = (string)$category;
                 $categoriesList[] = array(
                     'parent_id'   => (int)$category['parentId'],
-                    'name'        => trim( (string)$category ),
+                    'name'        => trim( htmlspecialchars( $categoryName, ENT_QUOTES ) ),
                     'id'          => (string)$category['id'],
                     'parent_name' => '',
                     'store_id'    => 0,
@@ -62,7 +65,7 @@
                     'sort_order'  => 1
                 );
             }
-            $categories_result = [];
+
             foreach ( $categoriesList as $item ) {
                 $item['parent_name'] = self::getParentCatName( $categoriesList, $item['parent_id'] );
                 $categories_result[] = $item;
@@ -142,18 +145,18 @@
                         $attr_value = (string)$param;
 
                         $attributes[] = [
-                            'name'  => $attr_name,
+                            'name'  => htmlspecialchars( $attr_name, ENT_QUOTES ),
                             'value' => $attr_value
                         ];
                     }
                 }
 
+                $categoryName        = (string)$offer->category;
                 $id_category         = (string)$offer->categoryId;
                 $product_description = isset( $offer->description ) ? (string)$offer->description : '';
-                $category_name       = isset( $offer->category ) ? (string)$offer->category : '';
+                $category_name       = isset( $offer->category ) ? htmlspecialchars( $categoryName, ENT_QUOTES ) : '';
                 $manufacturer        = isset( $offer->vendor ) ? (string)$offer->vendor : '';
                 $price_old           = isset( $offer->price_old ) ? (float)$offer->price_old : '';
-
 
                 if ( empty( $category_name ) ) {
                     $category_name = self::searchCatName( $id_category );
