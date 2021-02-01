@@ -46,9 +46,9 @@
          * @return array
          */
         public static function parseCategories( $categories ) {
-            $categoriesList   = array();
-            $data             = $categories->category;
-            self::$categoreis = [];
+            $categoriesList    = array();
+            $data              = $categories->category;
+            self::$categoreis  = [];
             $categories_result = [];
 
             foreach ( $data as $category ) {
