@@ -1,8 +1,8 @@
 <?php
 
     class ModelToolFoks extends Model {
-
-        private $log_folder = 'view/javascript/app/logs/';
+    
+        private const LOG_FOLDER = 'view/javascript/app/logs/';
 
         /**
          * Import categories
@@ -70,19 +70,27 @@
          * @param $products
          */
         public function addProducts( $products ) {
-            $i = 0;
+            set_time_limit(0);
 
+            $i = 1;
+         
             foreach ( $products as $product ) {
-                $i++;
-                $is_product = $this->getProductByUniqueId( $product['model'] );
-                if ( $is_product ) {
-                    $this->UpdateProductImport( $is_product, $product );
-                } else {
-                    $this->addProductImport( $product );
-                }
-                file_put_contents( DIR_APPLICATION . $this->log_folder . 'current.json', $i );
-            }
+                try {
+                    $is_product = $this->getProductByUniqueId( $product['model'] );
+    
+                    if ($is_product) {
+                        $this->UpdateProductImport($is_product, $product);
+                    } else {
+                        $this->addProductImport($product);
+                    }
 
+                } catch (\Exception $e) {
+                    file_put_contents( DIR_APPLICATION . self::LOG_FOLDER . 'error.json', $e->getMessage() );
+                }
+    
+                file_put_contents( DIR_APPLICATION . self::LOG_FOLDER . 'current.json', $i++ );
+                file_put_contents( DIR_APPLICATION . self::LOG_FOLDER . 'error.json', json_encode($product) );
+            }
         }
 
         /**
@@ -122,7 +130,7 @@
             $sql_q     .= "minimum = 1, subtract = 1, stock_status_id = 7, ";
             $sql_q     .= "date_available = '" . $this->db->escape( $data['date_available'] ) . "', manufacturer_id = '" . (int)$data['manufacturer_id'] . "', ";
             $sql_q     .= "shipping = 1, price = '" . (float)$data['price'] . "', ";
-            $sql_q     .= "status = 1,";
+            $sql_q     .= "status = {$data['status']}, ";
             $sql_q     .= "sort_order = 1, date_added = NOW(), date_modified = NOW()";
 
             $this->db->query( $sql_q );
@@ -160,7 +168,7 @@
                 $im = 1;
                 foreach ( $data['images'] as $product_image ) {
                     $img = $this->imgUrlUpload($product_image, (int)$product_id, true , $im);
-                    $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $img . "', sort_order = '" . (int)$im . "'" );
+                    $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $img . "', sort_order = '" . $im . "'" );
                     $im++;
                 }
             }
@@ -196,7 +204,7 @@
             $sql_q .= "minimum = 1, subtract = 1, stock_status_id = 7, ";
             $sql_q .= "date_available = '" . $this->db->escape( $data['date_available'] ) . "', manufacturer_id = '" . (int)$data['manufacturer_id'] . "', ";
             $sql_q .= "shipping = 1, price = '" . (float)$data['price'] . "', ";
-            $sql_q .= "status = 1, ";
+            $sql_q .= "status = {$data['status']}, ";
             $sql_q .= "sort_order = 1, date_modified = NOW() WHERE product_id = '" . (int)$product_id . "'";
 
             $this->db->query( $sql_q );
@@ -230,18 +238,17 @@
 
             if ( !empty( $data['images'] ) && !$load_without_img ) {
                 $im = 1;
+
                 foreach ( $data['images'] as $product_image ) {
                     $img = $this->imgUrlUpload($product_image, (int)$product_id, true, $im);
-                    $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $img. "', sort_order = '" . (int)$im . "'" );
+                    $this->db->query( "INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $img. "', sort_order = '" . $im . "'" );
                     $im++;
                 }
             }
 
-            if ( isset($data['description']) && !empty($data['description']) ) {
                 foreach ( $languages as $lang ) {
                     $this->db->query( "INSERT INTO " . DB_PREFIX . "product_description SET product_id = '" . (int)$product_id . "', language_id = '" . (int)$lang . "', name = '" . $this->db->escape( $data['name'] ) . "', description = '" . $this->db->escape( $data['description'] ) . "',  meta_title = '" . $this->db->escape( $data['name'] ) . "', meta_description = '" . $this->db->escape( $data['description'] ) . "', meta_keyword = ''" );
                 }
-            }
 
             $this->db->query( "DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'" );
 
@@ -254,7 +261,6 @@
             if ( $this->config->get( 'config_seo_pro' ) ) {
                 $this->cache->delete( 'seopro' );
             }
-
         }
 
         /**
@@ -337,6 +343,7 @@
          * @return mixed
          */
         public function getProductByUniqueId( $unique_id ) {
+
             $sql = "SELECT product_id as row FROM " . DB_PREFIX . "product ";
             $sql .= "WHERE model ='{$unique_id}' LIMIT 1";
 
