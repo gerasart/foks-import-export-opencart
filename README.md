@@ -30,11 +30,16 @@ admin/controller/common/menu.php
 ```$data['foks'] = $this->url->link('tool/foks', 'token=' . $this->session->data['token'], 'SSL');```
 
 и
-
+```
 admin/view/template/common/menu.tpl
+```
 
-перед  - <li><a href="<?php echo $upload; ?>"><?php echo $text_upload; ?></a></li>
+перед
+```
+<li><a href="<?php echo $upload; ?>"><?php echo $text_upload; ?></a></li>
+```
 
+вставить
 ```<li><a href="<?php echo $foks; ?>">Foks</a></li>```
 
 
