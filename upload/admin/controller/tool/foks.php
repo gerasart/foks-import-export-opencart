@@ -277,10 +277,10 @@ class ControllerToolFoks extends Controller
                 'date_available'  => date('Y-m-d'),
                 'manufacturer_id' => $this->getManufacturerId($manufacturer),
                 'manufacturer'    => $manufacturer,
-                'status'          => isset($offer['available']) && $offer['available'] === 'true' ? 1 : 0,
+                'status'          => 1,
                 'attributes'      => $this->model_tool_foks->addAttributes($attributes),
             ];
-            
+
             $result[$i] = $data;
         }
         

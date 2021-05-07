@@ -142,11 +142,10 @@
                 $this->db->query( "UPDATE " . DB_PREFIX . "product SET image = '" . $thumb . "' WHERE product_id = '" . (int)$product_id . "'" );
             }
 
-            if ( isset($data['description']) && !empty($data['description']) ) {
                 foreach ( $languages as $lang ) {
                     $this->db->query( "INSERT INTO " . DB_PREFIX . "product_description SET product_id = '" . (int)$product_id . "', language_id = '" . (int)$lang . "', name = '" . $this->db->escape( $data['name'] ) . "', description = '" . $this->db->escape( $data['description'] ) . "',  meta_title =  '" . $this->db->escape( $data['name'] ) . "', meta_description = '" . $this->db->escape( $data['description'] ) . "', meta_keyword = ''" );
                 }
-            }
+
             if ( isset( $data['attributes'] ) && !empty($data['attributes']) ) {
 
                 foreach ( $data['attributes'] as $attr_id => $attr_id_val ) {
@@ -395,13 +394,23 @@
 
             return $query->row;
         }
-
+    
+        /**
+         * @param $attr_name
+         *
+         * @return mixed
+         */
         public function isAttrGroup( $attr_name ) {
             $query = $this->db->query( "SELECT DISTINCT attribute_group_id FROM " . DB_PREFIX . "attribute_group_description WHERE name = '" . $attr_name . "'" );
 
             return $query->row;
         }
-
+    
+        /**
+         * @param $data
+         *
+         * @return mixed
+         */
         public function isAttribute($data) {
             $query = $this->db->query( "SELECT DISTINCT attribute_id FROM " . DB_PREFIX . "attribute_description WHERE name = '" . $data['name'] . "'" );
 
