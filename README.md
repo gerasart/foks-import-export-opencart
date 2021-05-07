@@ -38,3 +38,21 @@ admin/view/template/common/menu.tpl
 ```<li><a href="<?php echo $foks; ?>">Foks</a></li>```
 
 
+## Импорт с изображениями
+
+- частая проблема падение по крону с 504 ошибкой по таймаут, нужно на сервере увеличить время таймаута.
+
+```
+    PHP: max_execution_time = 30000
+    NGINX: fastcgi_read_timeout 30000;
+    proxy_connect_timeout 30000s;
+    proxy_read_timeout 30000s;
+    proxy_send_timeout 30000s;
+```
+
+## Жалемые характеристики хостинга
+
+```
+2x Xeon 64bit
+4 GB RAM
+```
