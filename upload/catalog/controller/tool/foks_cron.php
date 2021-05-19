@@ -129,7 +129,7 @@
          */
         public function parseProducts($offers)
         {
-            $this->load->model('tool/foks');
+            $this->load->model('tool/foks_cron');
             $count  = count($offers->offer);
             $result = [];
         
@@ -207,7 +207,7 @@
                     'manufacturer_id' => $this->getManufacturerId($manufacturer),
                     'manufacturer'    => $manufacturer,
                     'status'          => 1,
-                    'attributes'      => $this->model_tool_foks->addAttributes($attributes),
+                    'attributes'      => $this->model_tool_foks_cron->addAttributes($attributes),
                 ];
             
                 $result[$i] = $data;
@@ -215,7 +215,7 @@
         
             return $result;
         }
-
+        
         /**
          * Helper for import data.
          *
