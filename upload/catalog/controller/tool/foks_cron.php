@@ -258,30 +258,29 @@
         }
 
         /**
+         * Get manufacturer id
+         *
          * @param $name
+         *
          * @return false|mixed
          */
-        public function getManufacturerId( $name ) {
-
-            if ( !empty( $name ) ) {
-                $this->load->model( 'tool/foks_cron' );
+        public function getManufacturerId($name)
+        {
+            if ( ! empty($name)) {
+                $this->load->model('tool/foks_cron');
                 $data         = [
-                    'name'                     => addslashes( $name ),
+                    'name'                     => $name,
                     'sort_order'               => 1,
                     'noindex'                  => 1,
                     'manufacturer_description' => '',
                 ];
-                $manufacturer = $this->model_tool_foks_cron->isManufacturer( $data['name'] );
-                if ( isset( $manufacturer['manufacturer_id'] ) ) {
-                    $id = $manufacturer['manufacturer_id'];
-                } else {
-                    $id = $this->model_tool_foks_cron->addManufacturerImport( $data );
-                }
-                return $id;
+                $manufacturer = $this->model_tool_foks_cron->isManufacturer($data['name']);
+
+                return $manufacturer['manufacturer_id'] ?? $this->model_tool_foks_cron->addManufacturerImport($data);
             }
+
             return false;
         }
-
 
         /**
          * @param $name
