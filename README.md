@@ -2,7 +2,7 @@
 ***
 ![This is image title](http://res2.weblium.site/res/5b45bd7f6994e20025bdd7cc/5b47697c0240710022fdab69_optimized_443 "This is image title")
 ***
-# About Services
+# О сервисе
 Вы можете легко импортировать, експортировать товары в нашу систему.
 
 ### Одна платформа, безграничные возможности!
@@ -16,8 +16,8 @@
 
 - прямой доступ к модулю /admin/index.php?route=tool/foks&token=[токен вашей сессии]
 - установить модификатор foks.ocmod.zip
-- если не получилось распаковать архив и установить отдельно install.ocmod.xml через админку а файлы с папки uploads загрузить через ftp
-- при скачивании с github папку uploads and index.xml добавить в архив и назвать FOKS.ocmod.zip
+- если не получилось распаковать архив и установить отдельно install.ocmod.xml через админку, файлы с папки uploads загрузить через ftp
+- при скачивании с github папку uploads и index.xml добавить в архив, назвать FOKS.ocmod.zip
 - если при установке выдает ошибку с папки helpers установить localcopy.ocmod.zip для Вашей версии 
 
 ## Модуль не появился в админке по адресу 
